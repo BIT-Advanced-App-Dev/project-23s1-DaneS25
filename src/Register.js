@@ -13,15 +13,17 @@ function Register() {
   const navigate = useNavigate();
   const [loadingRegister, setLoadingRegister] = useState(false);
 
-
   const register = async () => {
-    if (!name) alert("Please enter name");
+    if (!name) {
+      alert("Please enter a name");
+      return; // Exit the function if name is not provided
+    }
+  
     setLoadingRegister(true);
     await registerWithEmailAndPassword(name, email, password);
     setLoadingRegister(false);
   };
   
-
   useEffect(() => {
     if (user) {
       navigate("/lobby");
