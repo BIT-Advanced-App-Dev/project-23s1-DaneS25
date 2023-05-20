@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from '../firebase'
 import { query, collection, where, getDocs } from 'firebase/firestore'
+import GameManager from './GameManager'
 
 function Lobby() {
   const [user, loading] = useAuthState(auth);
@@ -63,6 +64,7 @@ function Lobby() {
         Logged in as
         <div>{userName}</div>
       </div>
+      <GameManager />
     </div>
   )  
 }
