@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { RingLoader } from 'react-spinners';
 import { logInWithEmailAndPassword } from "./firebaseutils";
 
 function Login() {
@@ -10,6 +11,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
+  const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
     if (loading) {
@@ -17,6 +19,8 @@ function Login() {
     }
     if (user) {
       navigate("/Lobby");
+    } else {
+      setLoadingAuth(false);
     }
   }, [user, loading, navigate]);
 
@@ -49,8 +53,13 @@ function Login() {
 
   return (
     <div className="login">
+      {loadingAuth ? (
+        <div className="spinner-container">
+          <RingLoader color="#123abc" loading={loadingAuth} />
+        </div>
+      ) : (
       <div className="login__container">
-      <p className="loginHead">Login</p>
+        <p className="loginHead">Login</p>
         <input
           type="text"
           className="login__textBox"
@@ -72,6 +81,7 @@ function Login() {
           Don't have an account? <Link to="/register">Register</Link> now.
         </div>
       </div>
+    )}
     </div>
   );
 }

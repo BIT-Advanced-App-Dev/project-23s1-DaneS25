@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "./firebase";
+import { RingLoader } from 'react-spinners';
 import { registerWithEmailAndPassword } from "./firebaseutils";
 
 function Register() {
@@ -10,18 +11,30 @@ function Register() {
   const [name, setName] = useState("");
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
+  const [loadingRegister, setLoadingRegister] = useState(false);
 
-  const register = () => {
+
+  const register = async () => {
     if (!name) alert("Please enter name");
-    registerWithEmailAndPassword(name, email, password);
-    navigate("/");
+    setLoadingRegister(true);
+    await registerWithEmailAndPassword(name, email, password);
+    setLoadingRegister(false);
   };
+  
+
   useEffect(() => {
-    if (loading) return;
-    if (user) navigate.replace("/");
+    if (user) {
+      navigate("/lobby");
+    }
   }, [user, loading, navigate]);
+
   return (
     <div className="register">
+      {loadingRegister ? (
+        <div className="spinner-container">
+          <RingLoader color="#123abc" loading={true} />
+        </div>
+      ) : (
       <div className="register__container">
       <p className="registerHead">Register</p>
         <input
@@ -49,6 +62,7 @@ function Register() {
           Register
         </button>
       </div>
+    )}
     </div>
   );
 }
