@@ -37,7 +37,7 @@ function Login() {
           await setDoc(userDocRef, {
             email: user.email,
             uid: user.uid,
-            name: user.name,
+            name: user.displayName,
             authProvider: "local"
           });
         }

@@ -64,7 +64,7 @@ function Lobby() {
         Logged in as
         <div>{userName}</div>
       </div>
-      <GameManager />
+      <GameManager userName={userName} />
     </div>
   )  
 }
