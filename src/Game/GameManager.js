@@ -86,6 +86,19 @@ const GameManager = ({ userName }) => {
 
   const startGame = async (gameId) => {
     const gameRef = doc(db, 'games', gameId);
+    const playersRef = collection(gameRef, 'players');
+  
+    // Fetch the players' subcollection
+    const playersSnapshot = await getDocs(playersRef);
+    const playerCount = playersSnapshot.size;
+  
+    // Check if the number of players is greater than or equal to 2
+    if (playerCount < 2) {
+      console.log('Minimum 2 players required to start the game.');
+      return;
+    }
+  
+    // Update the game status to 'started'
     await updateDoc(gameRef, { status: 'started' });
   };
 
