@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs } from 'firebase/firestore';
+import { RingLoader } from 'react-spinners';
 
 const GameManager = ({ userName }) => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -103,8 +104,15 @@ const GameManager = ({ userName }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
-  }
+    document.body.style.overflow = 'hidden';
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100vw', height: '100vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <RingLoader color="#123abc" loading={loading} />
+        </div>
+      </div>
+    );
+  }    
 
   if (error) {
     return <div>Error occurred: {errorMessage}</div>;

@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "./firebase";
 import { RingLoader } from 'react-spinners';
 import { registerWithEmailAndPassword } from "./firebaseutils";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -15,8 +18,18 @@ function Register() {
 
   const register = async () => {
     if (!name) {
-      alert("Please enter a name");
+      toast.error("Please enter a name");
       return; // Exit the function if name is not provided
+    }
+
+    if (!email) {
+      toast.error("Please enter an email address");
+      return; // Exit the function if email is not provided
+    }
+
+    if (!password) {
+      toast.error("Please enter a password");
+      return; // Exit the function if password is not provided
     }
   
     setLoadingRegister(true);
@@ -32,6 +45,7 @@ function Register() {
 
   return (
     <div className="register">
+      <ToastContainer position="top-center" theme="dark" />
       {loadingRegister ? (
         <div className="spinner-container">
           <RingLoader color="#123abc" loading={true} />

@@ -5,6 +5,8 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { RingLoader } from 'react-spinners';
 import { logInWithEmailAndPassword } from "./firebaseutils";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -47,12 +49,13 @@ function Login() {
 
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
   return (
     <div className="login">
+      <ToastContainer position="top-center" theme="dark" />
       {loadingAuth ? (
         <div className="spinner-container">
           <RingLoader color="#123abc" loading={loadingAuth} />
