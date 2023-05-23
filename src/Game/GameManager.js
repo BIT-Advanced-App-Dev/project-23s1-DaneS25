@@ -105,10 +105,12 @@ const GameManager = ({ userName }) => {
       return;
     }
   
+    const playerNames = playersSnapshot.docs.map((doc) => doc.data().userName);
+  
     // Update the game status to 'started'
     await updateDoc(gameRef, { status: 'started' });
-    navigate(`/game/${gameId}`);
-  };
+    navigate(`/game/${gameId}?players=${encodeURIComponent(JSON.stringify(playerNames))}`);
+  };  
 
   if (loading) {
     document.body.style.overflow = 'hidden';
