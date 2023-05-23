@@ -5,6 +5,7 @@ import RingLoader from 'react-spinners/RingLoader';
 import Login from './Login';
 import RegisterPage from './Register';
 import Lobby from "./Game/Lobby";
+import GameInstance from "./Game/GameInstance";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -27,6 +28,7 @@ function App() {
             <Route exact path="/" element={<Login />} />
             <Route exact path="/register" element={<RegisterPage />} />
             <Route exact path="/lobby" element={<Lobby />} />
+            <Route exact path="/game/:gameId" element={<GameInstance />} />
           </Routes>
         </Router>
       )}

@@ -2,41 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs } from 'firebase/firestore';
 import { RingLoader } from 'react-spinners';
+import { useNavigate } from "react-router-dom";
 
 const GameManager = ({ userName }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'games'), async (snapshot) => {
       const gamesData = [];
-  
+
       for (const doc of snapshot.docs) {
         const gameData = doc.data();
         const playersRef = collection(db, 'games', doc.id, 'players');
         const playersSnapshot = await getDocs(playersRef);
         const playersData = playersSnapshot.docs.map((doc) => doc.data().userName);
-  
+
         const updatedGameData = {
           id: doc.id,
           ...gameData,
           players: playersData,
         };
-  
+
         gamesData.push(updatedGameData);
       }
-  
+
       setGames(gamesData);
       setLoading(false);
     }, (error) => {
       setError(error);
       setLoading(false);
     });
-  
+
     return () => unsubscribe();
-  }, []);  
+  }, []);
 
   const createGame = async () => {
     const user = auth.currentUser;
@@ -45,10 +47,14 @@ const GameManager = ({ userName }) => {
       return;
     }
 
-    await addDoc(collection(db, 'games'), {
+    const gameRef = await addDoc(collection(db, 'games'), {
       creator: user.uid,
       status: 'waiting',
     });
+
+    // Retrieve the generated game ID
+    const gameId = gameRef.id;
+    console.log('Created game with ID:', gameId);
   };
 
   const joinGame = async (gameId) => {
@@ -57,33 +63,33 @@ const GameManager = ({ userName }) => {
       setErrorMessage('You need to log in to join a group.');
       return;
     }
-  
+
     const gameRef = doc(db, 'games', gameId);
     const playersRef = collection(gameRef, 'players');
-  
+
     await addDoc(playersRef, { userId: user.uid, userName: userName });
-  
+
     const gameSnapshot = await getDoc(gameRef);
     const gameData = gameSnapshot.data();
-  
+
     const playersSnapshot = await getDocs(playersRef);
     const playersData = playersSnapshot.docs.map((doc) => doc.data().userName);
-  
+
     const updatedGame = {
       id: gameId,
       ...gameData,
       players: playersData,
     };
-  
+
     setGames((prevGames) => {
       const updatedGames = prevGames.map((game) =>
         game.id === updatedGame.id ? updatedGame : game
       );
       return updatedGames;
     });
-  
+
     console.log(`User ${user.uid} joined game ${gameId}`);
-  };  
+  };
 
   const startGame = async (gameId) => {
     const gameRef = doc(db, 'games', gameId);
@@ -101,6 +107,7 @@ const GameManager = ({ userName }) => {
   
     // Update the game status to 'started'
     await updateDoc(gameRef, { status: 'started' });
+    navigate(`/game/${gameId}`);
   };
 
   if (loading) {
@@ -112,7 +119,7 @@ const GameManager = ({ userName }) => {
         </div>
       </div>
     );
-  }    
+  }
 
   if (error) {
     return <div>Error occurred: {errorMessage}</div>;
@@ -133,13 +140,19 @@ const GameManager = ({ userName }) => {
             </>
           )}
 
-          {game.status === 'waiting' && game.creator === auth.currentUser?.uid && (
-            <button onClick={() => startGame(game.id)}>Start Game</button>
-          )}
+          {game.status === 'waiting' && game.creator === (auth.currentUser && auth.currentUser.uid) && (
+              <>
+                {game.players.length >= 2 ? (
+                  <button onClick={() => startGame(game.id)}>Start Game</button>
+                ) : (
+                  <span>Waiting for players...</span>
+                )}
+              </>
+            )}
         </div>
       ))}
     </div>
   );
-}
+};
 
 export default GameManager;
