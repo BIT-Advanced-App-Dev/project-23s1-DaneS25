@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs } from 'firebase/firestore';
 import { RingLoader } from 'react-spinners';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const GameManager = ({ userName }) => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -19,7 +19,7 @@ const GameManager = ({ userName }) => {
         const gameData = doc.data();
         const playersRef = collection(db, 'games', doc.id, 'players');
         const playersSnapshot = await getDocs(playersRef);
-        const playersData = playersSnapshot.docs.map((doc) => doc.data().userName);
+        const playersData = playersSnapshot.docs.map((doc) => doc.data());
 
         const updatedGameData = {
           id: doc.id,
@@ -28,6 +28,11 @@ const GameManager = ({ userName }) => {
         };
 
         gamesData.push(updatedGameData);
+
+        // Check if game status is 'started' and navigate players
+        if (updatedGameData.status === 'started') {
+          navigateToGameInstance(updatedGameData.id);
+        }
       }
 
       setGames(gamesData);
@@ -38,7 +43,7 @@ const GameManager = ({ userName }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const createGame = async () => {
     const user = auth.currentUser;
@@ -72,20 +77,22 @@ const GameManager = ({ userName }) => {
     const gameSnapshot = await getDoc(gameRef);
     const gameData = gameSnapshot.data();
 
-    const playersSnapshot = await getDocs(playersRef);
-    const playersData = playersSnapshot.docs.map((doc) => doc.data().userName);
+    // Subscribe to real-time updates for the players collection
+    onSnapshot(playersRef, (snapshot) => {
+      const playersData = snapshot.docs.map((doc) => doc.data());
 
-    const updatedGame = {
-      id: gameId,
-      ...gameData,
-      players: playersData,
-    };
+      const updatedGame = {
+        id: gameId,
+        ...gameData,
+        players: playersData,
+      };
 
-    setGames((prevGames) => {
-      const updatedGames = prevGames.map((game) =>
-        game.id === updatedGame.id ? updatedGame : game
-      );
-      return updatedGames;
+      setGames((prevGames) => {
+        const updatedGames = prevGames.map((game) =>
+          game.id === updatedGame.id ? updatedGame : game
+        );
+        return updatedGames;
+      });
     });
 
     console.log(`User ${user.uid} joined game ${gameId}`);
@@ -93,24 +100,34 @@ const GameManager = ({ userName }) => {
 
   const startGame = async (gameId) => {
     const gameRef = doc(db, 'games', gameId);
-    const playersRef = collection(gameRef, 'players');
-  
-    // Fetch the players' subcollection
-    const playersSnapshot = await getDocs(playersRef);
-    const playerCount = playersSnapshot.size;
-  
-    // Check if the number of players is greater than or equal to 2
-    if (playerCount < 2) {
-      console.log('Minimum 2 players required to start the game.');
-      return;
-    }
-  
-    const playerNames = playersSnapshot.docs.map((doc) => doc.data().userName);
-  
+    
     // Update the game status to 'started'
     await updateDoc(gameRef, { status: 'started' });
-    navigate(`/game/${gameId}?players=${encodeURIComponent(JSON.stringify(playerNames))}`);
-  };  
+    
+    // Log the game start
+    console.log(`Game ${gameId} started`);
+  };
+
+  const navigateToGameInstance = (gameId) => {
+    const gameRef = doc(db, 'games', gameId);
+    const playersRef = collection(gameRef, 'players');
+
+    getDocs(playersRef).then((playersSnapshot) => {
+      const playersData = playersSnapshot.docs.map((doc) => doc.data());
+      const players = playersData.map((player) => ({
+        name: player.userName,
+        id: player.userId,
+      }));
+
+      const currentUser = auth.currentUser;
+      const currentUserPlayer = players.find((player) => player.id === currentUser.uid);
+
+      if (currentUserPlayer) {
+        const gamePlayers = encodeURIComponent(JSON.stringify(players));
+        navigate(`/game/${gameId}?playerId=${currentUserPlayer.id}&players=${gamePlayers}`);
+      }
+    });
+  };
 
   if (loading) {
     document.body.style.overflow = 'hidden';
@@ -138,19 +155,19 @@ const GameManager = ({ userName }) => {
           {game.status === 'waiting' && (
             <>
               <button onClick={() => joinGame(game.id)}>Join Game</button>
-              <p>Players: {game.players.join(', ')}</p>
+              <p>Players: {game.players.map((player) => player.userName).join(', ')}</p>
             </>
           )}
 
           {game.status === 'waiting' && game.creator === (auth.currentUser && auth.currentUser.uid) && (
-              <>
-                {game.players.length >= 2 ? (
-                  <button onClick={() => startGame(game.id)}>Start Game</button>
-                ) : (
-                  <span>Waiting for players...</span>
-                )}
-              </>
-            )}
+            <>
+              {game.players.length >= 2 ? (
+                <button onClick={() => startGame(game.id)}>Start Game</button>
+              ) : (
+                <span>Waiting for players...</span>
+              )}
+            </>
+          )}
         </div>
       ))}
     </div>
