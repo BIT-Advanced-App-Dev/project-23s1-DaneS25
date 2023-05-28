@@ -79,7 +79,7 @@ const GameInstance = () => {
     }
   };
 
-  const handleDeleteClick = async () => {
+  const handleReplaceClick = async () => {
     const handRef = doc(db, 'games', gameId, 'hands', currentPlayer.id);
     const handSnapshot = await getDoc(handRef);
     const handData = handSnapshot.data();
@@ -145,7 +145,7 @@ const GameInstance = () => {
         return null;
       })}
       <div>
-        <button onClick={handleDeleteClick}>Delete Selected Cards</button>
+        <button onClick={handleReplaceClick}>Replace Cards</button>
       </div>
     </div>
   );  
