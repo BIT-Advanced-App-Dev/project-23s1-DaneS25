@@ -71,13 +71,30 @@ const GameInstance = () => {
     dealCards();
   };
 
-  const handleCardClick = (cardId) => {
+  const handleCardClick = async (cardId) => {
     if (selectedCards.includes(cardId)) {
       setSelectedCards(selectedCards.filter((id) => id !== cardId));
     } else {
       setSelectedCards([...selectedCards, cardId]);
     }
-  };
+  
+    try {
+      const handRef = doc(db, 'games', gameId, 'hands', currentPlayer.id);
+      const handSnapshot = await getDoc(handRef);
+      const handData = handSnapshot.data();
+  
+      const updatedCards = handData.cards.map((card) => {
+        if (card.id === cardId) {
+          return { ...card, checked: !card.checked };
+        }
+        return card;
+      });
+  
+      await updateDoc(handRef, { cards: updatedCards });
+    } catch (error) {
+      console.error('Error updating card checked status:', error);
+    }
+  };  
 
   const handleReplaceClick = async () => {
     const handRef = doc(db, 'games', gameId, 'hands', currentPlayer.id);
