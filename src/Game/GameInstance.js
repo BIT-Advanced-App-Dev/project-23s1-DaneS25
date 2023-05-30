@@ -15,6 +15,7 @@ const GameInstance = () => {
   const currentPlayer = players.find((player) => player.id === playerId);
   const [isGameCreator, setIsGameCreator] = useState(false);
   const [selectedCards, setSelectedCards] = useState([]);
+  const [currentTurnPlayerId, setCurrentTurnPlayerId] = useState(null);
 
   useEffect(() => {
     const fetchGameCreator = async () => {
@@ -47,11 +48,21 @@ const GameInstance = () => {
     return () => unsubscribe();
   }, [gameId, playerId]);
 
+  useEffect(() => {
+    const gameRef = doc(db, 'games', gameId);
+    const unsubscribe = onSnapshot(gameRef, (gameSnapshot) => {
+      const gameData = gameSnapshot.data();
+      setCurrentTurnPlayerId(gameData.currentTurnPlayerId);
+    });
+
+    return () => unsubscribe();
+  }, [gameId]);
+
   const dealCards = async () => {
     const shuffledDeck = [...deck].sort(() => Math.random() - 0.5);
 
     const gameRef = doc(db, 'games', gameId);
-
+    await updateDoc(gameRef, { currentTurnPlayerId: players[0].id });
     // Create the "hands" subcollection
     const handsCollectionRef = collection(gameRef, 'hands');
     await setDoc(doc(handsCollectionRef), {}); // Create an empty document in the "hands" subcollection
@@ -72,28 +83,30 @@ const GameInstance = () => {
   };
 
   const handleCardClick = async (cardId) => {
-    if (selectedCards.includes(cardId)) {
-      setSelectedCards(selectedCards.filter((id) => id !== cardId));
-    } else {
-      setSelectedCards([...selectedCards, cardId]);
-    }
-  
-    try {
-      const handRef = doc(db, 'games', gameId, 'hands', currentPlayer.id);
-      const handSnapshot = await getDoc(handRef);
-      const handData = handSnapshot.data();
-  
-      const updatedCards = handData.cards.map((card) => {
-        if (card.id === cardId) {
-          return { ...card, checked: !card.checked };
-        }
-        return card;
-      });
-  
-      await updateDoc(handRef, { cards: updatedCards });
-    } catch (error) {
-      console.error('Error updating card checked status:', error);
-    }
+    if (currentPlayer.id === currentTurnPlayerId) {
+      if (selectedCards.includes(cardId)) {
+        setSelectedCards(selectedCards.filter((id) => id !== cardId));
+      } else {
+        setSelectedCards([...selectedCards, cardId]);
+      }
+    
+      try {
+        const handRef = doc(db, 'games', gameId, 'hands', currentPlayer.id);
+        const handSnapshot = await getDoc(handRef);
+        const handData = handSnapshot.data();
+    
+        const updatedCards = handData.cards.map((card) => {
+          if (card.id === cardId) {
+            return { ...card, checked: !card.checked };
+          }
+          return card;
+        });
+    
+        await updateDoc(handRef, { cards: updatedCards });
+      } catch (error) {
+        console.error('Error updating card checked status:', error);
+      }
+    };
   };  
 
   const handleReplaceClick = async () => {
@@ -166,6 +179,13 @@ const GameInstance = () => {
     } else {
       console.error('No valid hand data found.');
     }
+    // Update the current turn player ID after replacing cards
+    const currentPlayerIndex = players.findIndex((player) => player.id === currentPlayer.id);
+    const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    const nextPlayerId = players[nextPlayerIndex].id;
+  
+    const gameRef = doc(db, 'games', gameId);
+    await updateDoc(gameRef, { currentTurnPlayerId: nextPlayerId });
   };
   
   // Function to shuffle an array using Fisher-Yates algorithm
@@ -196,13 +216,13 @@ const GameInstance = () => {
             <div key={dealt.player}>
               <ul>
                 {dealt.cards.map((card) => (
-                  <li
+                  <div
                     key={card.id}
                     style={{ backgroundColor: selectedCards.includes(card.id) ? 'yellow' : 'white' }}
                     onClick={() => handleCardClick(card.id)}
                   >
                     {`${card.name} of ${card.suit}`}
-                  </li>
+                  </div>
                 ))}
               </ul>
             </div>
@@ -210,9 +230,12 @@ const GameInstance = () => {
         }
         return null;
       })}
-      <div>
-        <button onClick={handleReplaceClick}>Replace Cards</button>
-      </div>
+      {currentPlayer.id === currentTurnPlayerId && (
+        <div>
+          <p>It is now your turn!</p>
+          <button onClick={handleReplaceClick}>Replace Cards</button>
+        </div>
+      )}
     </div>
   );  
 };
