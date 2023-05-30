@@ -196,7 +196,16 @@ const GameInstance = () => {
       [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
     return newArray;
-  };     
+  };
+  
+  const handlePassClick = async () => {
+    const currentPlayerIndex = players.findIndex((player) => player.id === currentPlayer.id);
+    const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    const nextPlayerId = players[nextPlayerIndex].id;
+  
+    const gameRef = doc(db, 'games', gameId);
+    await updateDoc(gameRef, { currentTurnPlayerId: nextPlayerId });
+  };  
 
   return (
     <div>
@@ -234,6 +243,7 @@ const GameInstance = () => {
         <div>
           <p>It is now your turn!</p>
           <button onClick={handleReplaceClick}>Replace Cards</button>
+          <button onClick={handlePassClick}>Pass</button>
         </div>
       )}
     </div>
