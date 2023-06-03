@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot, setDoc, writeBatch, updateDoc, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import deck from './Assets/deck.json';
 
 const GameInstance = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const gameId = location.pathname.split('/game/')[1];
   const playerId = searchParams.get('playerId');
@@ -16,6 +17,7 @@ const GameInstance = () => {
   const [isGameCreator, setIsGameCreator] = useState(false);
   const [selectedCards, setSelectedCards] = useState([]);
   const [currentTurnPlayerId, setCurrentTurnPlayerId] = useState(null);
+  const [gameEnded, setGameEnded] = useState(false);
 
   useEffect(() => {
     const fetchGameCreator = async () => {
@@ -186,6 +188,9 @@ const GameInstance = () => {
   
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: nextPlayerId });
+    setTimeout(() => {
+      setGameEnded(true);
+    }, 3000);
   };
   
   // Function to shuffle an array using Fisher-Yates algorithm
@@ -205,7 +210,15 @@ const GameInstance = () => {
   
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: nextPlayerId });
+    setGameEnded(true);
   };  
+
+  useEffect(() => {
+    console.log('Game Ended:', gameEnded);
+    if (gameEnded) {
+      navigate('/evaluation');
+    }
+  }, [gameEnded, navigate]);
 
   return (
     <div>
