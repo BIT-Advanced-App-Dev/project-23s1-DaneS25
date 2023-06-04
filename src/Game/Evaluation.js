@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
+import evaluateHand from './HandEvaluator';
 
 const Evaluation = () => {
   const location = useLocation();
@@ -19,7 +20,12 @@ const Evaluation = () => {
         const newDealtCards = [];
         snapshot.forEach((doc) => {
           const handData = doc.data();
-          newDealtCards.push({ player: handData.playerId, cards: handData.cards });
+          const evaluatedHand = evaluateHand(handData.cards); // Evaluate the hand
+          newDealtCards.push({
+            player: handData.playerId,
+            cards: handData.cards,
+            ...evaluatedHand, // Attach handType and handStrength
+          });
         });
         setDealtCards(newDealtCards);
       }
@@ -31,20 +37,22 @@ const Evaluation = () => {
   return (
     <div>
       <h1>Evaluation</h1>
-        {dealtCards.map((hand, index) => (
-          <p key={index}>
-            <p>Player: {hand.player}</p>
-            <p>
-              Cards:
-              {hand.cards.map((card, cardIndex) => (
-                <p key={cardIndex}>
-                  {card.name} of {card.suit}
-                  {cardIndex !== hand.cards.length - 1 && ', '}
-                </p>
-              ))}
-            </p>
+      {dealtCards.map((hand, index) => (
+        <div key={index}>
+          <p>Player: {hand.player}</p>
+          <p>
+            Cards:
+            {hand.cards.map((card, cardIndex) => (
+              <span key={cardIndex}>
+                {card.name} of {card.suit}
+                {cardIndex !== hand.cards.length - 1 && ', '}
+              </span>
+            ))}
           </p>
-        ))}
+          <p>Hand Type: {hand.handType}</p>
+          <p>Hand Strength: {hand.handStrength}</p>
+        </div>
+      ))}
     </div>
   );
 };
