@@ -216,9 +216,9 @@ const GameInstance = () => {
   useEffect(() => {
     console.log('Game Ended:', gameEnded);
     if (gameEnded) {
-      navigate('/evaluation');
+      navigate(`/evaluation?gameId=${gameId}&playerId=${playerId}`);
     }
-  }, [gameEnded, navigate]);
+  }, [gameEnded, gameId, playerId, navigate]);
 
   return (
     <div>
