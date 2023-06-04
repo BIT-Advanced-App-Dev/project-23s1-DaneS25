@@ -12,6 +12,27 @@ const GameManager = ({ userName }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const navigateToGameInstance = (gameId) => {
+      const gameRef = doc(db, 'games', gameId);
+      const playersRef = collection(gameRef, 'players');
+
+      getDocs(playersRef).then((playersSnapshot) => {
+        const playersData = playersSnapshot.docs.map((doc) => doc.data());
+        const players = playersData.map((player) => ({
+          name: player.userName,
+          id: player.userId,
+        }));
+
+        const currentUser = auth.currentUser;
+        const currentUserPlayer = players.find((player) => player.id === currentUser.uid);
+
+        if (currentUserPlayer) {
+          const gamePlayers = encodeURIComponent(JSON.stringify(players));
+          navigate(`/game/${gameId}?playerId=${currentUserPlayer.id}&players=${gamePlayers}`);
+        }
+      });
+    };
+
     const unsubscribe = onSnapshot(collection(db, 'games'), async (snapshot) => {
       const gamesData = [];
 
@@ -100,33 +121,12 @@ const GameManager = ({ userName }) => {
 
   const startGame = async (gameId) => {
     const gameRef = doc(db, 'games', gameId);
-    
+
     // Update the game status to 'started'
     await updateDoc(gameRef, { status: 'started' });
-    
+
     // Log the game start
     console.log(`Game ${gameId} started`);
-  };
-
-  const navigateToGameInstance = (gameId) => {
-    const gameRef = doc(db, 'games', gameId);
-    const playersRef = collection(gameRef, 'players');
-
-    getDocs(playersRef).then((playersSnapshot) => {
-      const playersData = playersSnapshot.docs.map((doc) => doc.data());
-      const players = playersData.map((player) => ({
-        name: player.userName,
-        id: player.userId,
-      }));
-
-      const currentUser = auth.currentUser;
-      const currentUserPlayer = players.find((player) => player.id === currentUser.uid);
-
-      if (currentUserPlayer) {
-        const gamePlayers = encodeURIComponent(JSON.stringify(players));
-        navigate(`/game/${gameId}?playerId=${currentUserPlayer.id}&players=${gamePlayers}`);
-      }
-    });
   };
 
   if (loading) {
