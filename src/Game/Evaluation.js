@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import evaluateHand from './HandEvaluator';
 
@@ -28,6 +28,15 @@ const Evaluation = () => {
           });
         });
         setDealtCards(newDealtCards);
+
+        // Update the evaluatedHands subcollection
+        const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
+        const evaluatedHandDocRef = doc(evaluatedHandsCollectionRef, playerId);
+
+        setDoc(evaluatedHandDocRef, {
+          playerId: playerId,
+          evaluatedCards: newDealtCards,
+        });
       }
     );
 
