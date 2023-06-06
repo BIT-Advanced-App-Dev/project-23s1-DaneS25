@@ -59,7 +59,7 @@ const Evaluation = () => {
             ))}
           </p>
           <p>Hand Type: {hand.handType}</p>
-          <p>Hand Strength: {hand.handStrength}</p>
+          <p>Hand Strength: {hand.handStrength.toFixed(2)}</p>
         </div>
       ))}
     </div>
