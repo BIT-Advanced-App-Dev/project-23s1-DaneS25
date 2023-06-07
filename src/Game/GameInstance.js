@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot, setDoc, writeBatch, updateDoc, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import deck from './Assets/deck.json';
+import "./gameInstance.css";
 
 const GameInstance = () => {
   const location = useLocation();
@@ -222,41 +223,43 @@ const GameInstance = () => {
 
   return (
     <div>
-      <h1>Game Instance</h1>
-      <h2>Game ID: {gameId}</h2>
-      <h3>Player ID: {playerId}</h3>
-      <h3>Current Player: {currentPlayer.name}</h3>
+      <h1 className='head'>Game Instance</h1>
+      <p>Game ID: {gameId}</p>
+      <p className='playerName'>Current Player: {currentPlayer.name}</p>
       {isGameCreator && (
         <div>
-          <button onClick={handleDealClick}>Deal Cards</button>
+          <button className='dealButton' onClick={handleDealClick}>Deal Cards</button>
         </div>
       )}
-      <h4>Your Cards:</h4>
-      {dealtCards.map((dealt) => {
-        if (dealt.player === playerId) {
-          return (
-            <div key={dealt.player}>
-              <ul>
-                {dealt.cards.map((card) => (
-                  <div
-                    key={card.id}
-                    style={{ backgroundColor: selectedCards.includes(card.id) ? 'yellow' : 'white' }}
-                    onClick={() => handleCardClick(card.id)}
-                  >
-                    {`${card.name} of ${card.suit}`}
-                  </div>
-                ))}
-              </ul>
-            </div>
-          );
-        }
-        return null;
-      })}
+      <p className='turn'>Your Cards:</p>
+        <div className="cards-container">
+          {dealtCards.map((dealt) => {
+            if (dealt.player === playerId) {
+              return (
+                <div key={dealt.player}>
+                  <ul>
+                    {dealt.cards.map((card) => (
+                      <span
+                        className="cards"
+                        key={card.id}
+                        style={{ backgroundColor: selectedCards.includes(card.id) ? 'hsl(219, 92%, 53%)' : '#5ad9f3' }}
+                        onClick={() => handleCardClick(card.id)}
+                      >
+                        {`${card.name} of ${card.suit}`}
+                      </span>
+                    ))}
+                  </ul>
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
       {currentPlayer.id === currentTurnPlayerId && (
         <div>
-          <p>It is now your turn!</p>
-          <button onClick={handleReplaceClick}>Replace Cards</button>
-          <button onClick={handlePassClick}>Pass</button>
+          <p className='turn'>It is now your turn!</p>
+          <button className='replaceButton' onClick={handleReplaceClick}>Replace Cards</button>
+          <button className='passButton' onClick={handlePassClick}>Pass</button>
         </div>
       )}
     </div>

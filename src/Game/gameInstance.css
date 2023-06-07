@@ -1,0 +1,66 @@
+.dealButton {
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.dealButton:hover {
+    background-color: hsl(219, 92%, 53%);
+}
+.playerName {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    text-align: left;
+}
+.cards {
+    width: 200px;
+    height: 250px;
+    text-align: center;
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    box-shadow: 0 6px 18px -9px hsl(229, 93%, 58%);
+    transition: transform 0.3s ease;
+}
+.cards:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+.turn {
+    font-size: 20px;
+}
+.replaceButton {
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+.replaceButton:hover {
+    background-color: hsl(219, 92%, 53%);
+}
+.passButton {
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.passButton:hover {
+    background-color: hsl(219, 92%, 53%);
+}
+  
