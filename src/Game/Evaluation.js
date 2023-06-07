@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import evaluateHand from './HandEvaluator';
 import "./evaluation.css"
@@ -10,6 +10,8 @@ const Evaluation = () => {
   const searchParams = new URLSearchParams(location.search);
   const gameId = searchParams.get('gameId');
   const playerId = searchParams.get('playerId');
+  const [evaluationTriggered, setEvaluationTriggered] = useState(false);
+  const [winningHand, setWinningHand] = useState(null);
 
   const [dealtCards, setDealtCards] = useState([]);
 
@@ -44,9 +46,55 @@ const Evaluation = () => {
     return () => unsubscribe();
   }, [gameId, playerId]);
 
+  useEffect(() => {
+    if (evaluationTriggered) {
+      const evaluateHands = async () => {
+        const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
+
+        // Query all evaluated hands
+        const evaluatedHandsSnapshot = await getDocs(evaluatedHandsCollectionRef);
+
+        if (evaluatedHandsSnapshot.empty) {
+          console.log('Evaluated hands subcollection is empty');
+          return;
+        }
+
+        let highestHand = null;
+
+        evaluatedHandsSnapshot.forEach((doc) => {
+          const evaluatedHandData = doc.data();
+          const evaluatedCards = evaluatedHandData.evaluatedCards;
+
+          if (!evaluatedCards || evaluatedCards.length === 0) {
+            console.log('Evaluated cards data is missing for', doc.id);
+            return;
+          }
+
+          evaluatedCards.forEach((hand) => {
+            if (!highestHand || hand.handStrength > highestHand.handStrength) {
+              highestHand = hand;
+            }
+          });
+        });
+
+        if (highestHand) {
+          setWinningHand(highestHand);
+          console.log('Hand with highest handStrength:', highestHand);
+        } else {
+          console.log('No evaluated hands found');
+        }
+      };
+
+      evaluateHands();
+    }
+  }, [evaluationTriggered, gameId]);
+
   return (
     <div>
       <h1 className='head'>Evaluation</h1>
+      {!evaluationTriggered && (
+        <button className='evaluateButton' onClick={() => setEvaluationTriggered(true)}>Evaluate</button>
+      )}
       {dealtCards.map((hand, index) => (
         <div key={index}>
           <p className='evaluationText'>
@@ -59,6 +107,21 @@ const Evaluation = () => {
           </p>
           <p className='handText'>Hand Type: {hand.handType}</p>
           <p className='handText'>Hand Strength: {hand.handStrength.toFixed(2)}</p>
+          {winningHand && (
+            <div className='winningHand'>
+              <h2>Winning Hand</h2>
+              <p className='evaluationText'>
+                {winningHand.cards.map((card, cardIndex) => (
+                  <p className="cards" key={cardIndex}>
+                    {card.name} of {card.suit}
+                    {cardIndex !== winningHand.cards.length - 1}
+                  </p>
+                ))}
+              </p>
+              <p className='handText'>Hand Type: {winningHand.handType}</p>
+              <p className='handText'>Hand Strength: {winningHand.handStrength.toFixed(2)}</p>
+            </div>
+          )}
         </div>
       ))}
     </div>
