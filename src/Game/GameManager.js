@@ -3,6 +3,7 @@ import { db, auth } from '../firebase';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs } from 'firebase/firestore';
 import { RingLoader } from 'react-spinners';
 import { useNavigate } from 'react-router-dom';
+import "./gameManager.css";
 
 const GameManager = ({ userName }) => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -146,7 +147,7 @@ const GameManager = ({ userName }) => {
 
   return (
     <div>
-      <button onClick={createGame}>Create Game</button>
+      <button className='createButton' onClick={createGame}>Create Game</button>
       {games.map((game) => (
         <div key={game.id}>
           <p>Game ID: {game.id}</p>
@@ -154,15 +155,15 @@ const GameManager = ({ userName }) => {
 
           {game.status === 'waiting' && (
             <>
-              <button onClick={() => joinGame(game.id)}>Join Game</button>
-              <p>Players: {game.players.map((player) => player.userName).join(', ')}</p>
+              <button className='joinButton' onClick={() => joinGame(game.id)}>Join Game</button>
+              <p className='players'>Players: {game.players.map((player) => player.userName).join(', ')}</p>
             </>
           )}
 
           {game.status === 'waiting' && game.creator === (auth.currentUser && auth.currentUser.uid) && (
             <>
               {game.players.length >= 2 ? (
-                <button onClick={() => startGame(game.id)}>Start Game</button>
+                <button className='startButton' onClick={() => startGame(game.id)}>Start Game</button>
               ) : (
                 <span>Waiting for players...</span>
               )}

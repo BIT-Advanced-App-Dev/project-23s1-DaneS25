@@ -4,6 +4,7 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from '../firebase'
 import { query, collection, where, getDocs } from 'firebase/firestore'
 import GameManager from './GameManager'
+import "./lobby.css";
 
 function Lobby() {
   const [user, loading] = useAuthState(auth);
@@ -56,7 +57,7 @@ function Lobby() {
 
   return (
     <div className='lobby'>
-      <header>Lobby</header>
+      <header className='head'>Lobby</header>
       <button className="logout_btn" onClick={logout}>
         Logout
       </button>

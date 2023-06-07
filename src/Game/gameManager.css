@@ -1,0 +1,39 @@
+.createButton {
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.createButton:hover {
+    background-color: hsl(219, 92%, 53%);
+}
+.joinButton {
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.joinButton:hover {
+    background-color: hsl(219, 92%, 53%);
+}
+.startButton {
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.startButton:hover {
+    background-color: hsl(219, 92%, 53%);
+}
+.players {
+    font-size: 18px;
+    margin-bottom: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
