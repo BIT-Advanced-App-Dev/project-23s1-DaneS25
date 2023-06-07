@@ -6,6 +6,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { RingLoader } from 'react-spinners';
 import { logInWithEmailAndPassword } from "./firebaseutils";
 import { ToastContainer, toast } from "react-toastify";
+import "./login.css";
 import "react-toastify/dist/ReactToastify.css";
 
 function Login() {

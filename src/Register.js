@@ -6,6 +6,7 @@ import { RingLoader } from 'react-spinners';
 import { registerWithEmailAndPassword } from "./firebaseutils";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "./register.css";
 
 
 function Register() {
