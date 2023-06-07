@@ -5,9 +5,11 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
+    background-color: rgb(96, 204, 250);
 }
 .createButton:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
 .joinButton {
     font-size: 18px;
@@ -16,9 +18,11 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
+    background-color: rgb(96, 204, 250);
 }
 .joinButton:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
 .startButton {
     font-size: 18px;
@@ -27,12 +31,14 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
+    background-color: rgb(96, 204, 250);
 }
 .startButton:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
 .players {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;

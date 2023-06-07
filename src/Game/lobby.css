@@ -7,12 +7,14 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
+    background-color: rgb(96, 204, 250);
 }
 .logout_btn:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
 .userDetails {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;

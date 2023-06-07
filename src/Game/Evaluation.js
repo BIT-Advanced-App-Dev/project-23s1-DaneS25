@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import evaluateHand from './HandEvaluator';
+import "./evaluation.css"
 
 const Evaluation = () => {
   const location = useLocation();
@@ -45,21 +46,19 @@ const Evaluation = () => {
 
   return (
     <div>
-      <h1>Evaluation</h1>
+      <h1 className='head'>Evaluation</h1>
       {dealtCards.map((hand, index) => (
         <div key={index}>
-          <p>Player: {hand.player}</p>
-          <p>
-            Cards:
+          <p className='evaluationText'>
             {hand.cards.map((card, cardIndex) => (
-              <span key={cardIndex}>
+              <p className="cards" key={cardIndex}>
                 {card.name} of {card.suit}
-                {cardIndex !== hand.cards.length - 1 && ', '}
-              </span>
+                {cardIndex !== hand.cards.length - 1}
+              </p>
             ))}
           </p>
-          <p>Hand Type: {hand.handType}</p>
-          <p>Hand Strength: {hand.handStrength.toFixed(2)}</p>
+          <p className='handText'>Hand Type: {hand.handType}</p>
+          <p className='handText'>Hand Strength: {hand.handStrength.toFixed(2)}</p>
         </div>
       ))}
     </div>

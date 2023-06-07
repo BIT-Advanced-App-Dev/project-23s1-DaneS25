@@ -57,7 +57,7 @@ function Lobby() {
 
   return (
     <div className='lobby'>
-      <header className='head'>Lobby</header>
+      <h1 className='head'>Lobby</h1>
       <button className="logout_btn" onClick={logout}>
         Logout
       </button>

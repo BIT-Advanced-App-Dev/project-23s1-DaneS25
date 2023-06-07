@@ -9,6 +9,7 @@
 }
 .dealButton:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
 .playerName {
     font-size: 20px;
@@ -33,6 +34,7 @@
     border-radius: 5px;
     box-shadow: 0 6px 18px -9px hsl(229, 93%, 58%);
     transition: transform 0.3s ease;
+    background-color: #5ad9f3;
 }
 .cards:hover {
     transform: scale(1.05);
@@ -53,6 +55,7 @@
 }
 .replaceButton:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
 .passButton {
     font-size: 18px;
@@ -65,5 +68,6 @@
 }
 .passButton:hover {
     background-color: hsl(219, 92%, 53%);
+    cursor: pointer;
 }
   

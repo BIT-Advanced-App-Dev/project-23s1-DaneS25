@@ -63,7 +63,7 @@ function Login() {
         </div>
       ) : (
       <div className="login__container">
-        <p className="loginHead">Login</p>
+        <h1 className="loginHead">Login</h1>
         <input
           type="text"
           className="login__textBox"
