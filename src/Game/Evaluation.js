@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot, doc, setDoc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -14,6 +14,36 @@ const Evaluation = () => {
   const [winningHand, setWinningHand] = useState(null);
 
   const [dealtCards, setDealtCards] = useState([]);
+  const [playerCount, setPlayerCount] = useState(0);
+  const [evaluatedHandsCount, setEvaluatedHandsCount] = useState(0);
+
+  // Function to count the documents in the player subcollection
+  const countPlayerDocuments = useCallback(async () => {
+    const playerCollectionRef = collection(db, 'games', gameId, 'players');
+    const playerSnapshot = await getDocs(playerCollectionRef);
+    const count = playerSnapshot.size;
+    console.log('Total player documents:', count);
+    setPlayerCount(count);
+  }, [gameId]);
+
+  // Function to count the documents in the evaluatedHands subcollection
+  const countEvaluatedHandsDocuments = useCallback(() => {
+    const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
+    const unsubscribe = onSnapshot(evaluatedHandsCollectionRef, (snapshot) => {
+      const count = snapshot.size;
+      console.log('Total evaluatedHands documents:', count);
+      setEvaluatedHandsCount(count);
+    });
+
+    return () => unsubscribe();
+  }, [gameId]);
+
+  useEffect(() => {
+    countPlayerDocuments();
+    const unsubscribe = countEvaluatedHandsDocuments();
+
+    return () => unsubscribe();
+  }, [countPlayerDocuments, countEvaluatedHandsDocuments]);
 
   useEffect(() => {
     const handsCollectionRef = collection(db, 'games', gameId, 'hands');
@@ -47,7 +77,7 @@ const Evaluation = () => {
   }, [gameId, playerId]);
 
   useEffect(() => {
-    if (evaluationTriggered) {
+    if (evaluationTriggered && playerCount === evaluatedHandsCount) {
       const evaluateHands = async () => {
         const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
 
@@ -87,12 +117,12 @@ const Evaluation = () => {
 
       evaluateHands();
     }
-  }, [evaluationTriggered, gameId]);
+  }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount]);
 
   return (
     <div>
       <h1 className='head'>Evaluation</h1>
-      {!evaluationTriggered && (
+      {!evaluationTriggered && playerCount === evaluatedHandsCount && (
         <button className='evaluateButton' onClick={() => setEvaluationTriggered(true)}>Evaluate</button>
       )}
       {dealtCards.map((hand, index) => (
