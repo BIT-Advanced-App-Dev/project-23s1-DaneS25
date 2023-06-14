@@ -1,21 +1,49 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
-import { collection, query, where, onSnapshot, doc, setDoc, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { collection, query, where, onSnapshot, doc, setDoc, getDocs, getDoc, deleteDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
 import evaluateHand from './HandEvaluator';
 import "./evaluation.css"
 
 const Evaluation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const gameId = searchParams.get('gameId');
   const playerId = searchParams.get('playerId');
   const [evaluationTriggered, setEvaluationTriggered] = useState(false);
   const [winningHand, setWinningHand] = useState(null);
-
   const [dealtCards, setDealtCards] = useState([]);
   const [playerCount, setPlayerCount] = useState(0);
   const [evaluatedHandsCount, setEvaluatedHandsCount] = useState(0);
+  const [clickCount, setClickCount] = useState(0);
+  const [isGameCreator, setIsGameCreator] = useState(false);
+
+  useEffect(() => {
+    const fetchGameCreator = async () => {
+      const gameRef = doc(db, 'games', gameId);
+      const gameSnapshot = await getDoc(gameRef);
+      const gameData = gameSnapshot.data();
+      const gameCreatorUid = gameData.creator;
+      const currentUser = auth.currentUser;
+
+      setIsGameCreator(currentUser && currentUser.uid === gameCreatorUid);
+    };
+
+    fetchGameCreator();
+  }, [gameId]);
+
+  const createClickCountDocument = async () => {
+    const clickCountCollectionRef = collection(db, 'games', gameId, 'clickCount');
+    const newClickCountDocRef = doc(clickCountCollectionRef);
+
+    // Create a new document with a count variable
+    await setDoc(newClickCountDocRef, {
+      count: 1 // Set the initial count to 1
+    });
+
+    console.log('New clickCount document created');
+  };
 
   // Function to count the documents in the player subcollection
   const countPlayerDocuments = useCallback(async () => {
@@ -38,12 +66,28 @@ const Evaluation = () => {
     return () => unsubscribe();
   }, [gameId]);
 
-  useEffect(() => {
-    countPlayerDocuments();
-    const unsubscribe = countEvaluatedHandsDocuments();
+  // Function to count the documents in the clickCount subcollection
+  const countClickCountDocuments = useCallback(() => {
+    const clickCountCollectionRef = collection(db, 'games', gameId, 'clickCount');
+    const unsubscribe = onSnapshot(clickCountCollectionRef, (snapshot) => {
+      const count = snapshot.size;
+      console.log('Total clickCount documents:', count);
+      setClickCount(count);
+    });
 
     return () => unsubscribe();
-  }, [countPlayerDocuments, countEvaluatedHandsDocuments]);
+  }, [gameId]);
+
+  useEffect(() => {
+    countPlayerDocuments();
+    const unsubscribeEvaluatedHands = countEvaluatedHandsDocuments();
+    const unsubscribeClickCount = countClickCountDocuments();
+
+    return () => {
+      unsubscribeEvaluatedHands();
+      unsubscribeClickCount();
+    };
+  }, [countPlayerDocuments, countEvaluatedHandsDocuments, countClickCountDocuments]);
 
   useEffect(() => {
     const handsCollectionRef = collection(db, 'games', gameId, 'hands');
@@ -117,13 +161,46 @@ const Evaluation = () => {
 
       evaluateHands();
     }
-  }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount]);
+  }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount, clickCount]);
+
+  const handleExit = async () => {
+    try { 
+      const playersCollectionRef = collection(db, 'games', gameId, 'players');
+      const playersSnapshot = await getDocs(playersCollectionRef);
+  
+      const navigationPromises = playersSnapshot.docs.map(async (doc) => {
+        const player = doc.data();
+        const playerId = player.playerId;
+        await navigate(`/lobby?playerId=${playerId}`);
+      });
+  
+      await Promise.all(navigationPromises);
+  
+      // Delete the game document
+      const gameDocRef = doc(collection(db, 'games'), gameId);
+      await deleteDoc(gameDocRef);
+  
+      // Navigate the current player to '/lobby'
+      await navigate('/lobby');
+    } catch (error) {
+      console.log('Error navigating to the lobby:', error);
+    }
+  }; 
 
   return (
     <div>
       <h1 className='head'>Evaluation</h1>
       {!evaluationTriggered && playerCount === evaluatedHandsCount && (
-        <button className='evaluateButton' onClick={() => setEvaluationTriggered(true)}>Evaluate</button>
+        <button className='evaluateButton' onClick={() => {
+          setEvaluationTriggered(true);
+          createClickCountDocument();
+        }}>Evaluate</button>
+      )}
+      {isGameCreator && playerCount === clickCount && (
+        <button className='exitButton' onClick={handleExit}>Exit</button>
+      )}
+      {!isGameCreator && playerCount === clickCount && (
+        <button className='exitButton' onClick={handleExit}>Exit</button>
       )}
       {dealtCards.map((hand, index) => (
         <div key={index}>
