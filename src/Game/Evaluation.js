@@ -99,26 +99,28 @@ const Evaluation = () => {
           const handData = doc.data();
           const evaluatedHand = evaluateHand(handData.cards); // Evaluate the hand
           newDealtCards.push({
-            player: handData.playerId,
+            playerId: handData.playerId,
+            playerName: handData.playerName, // Add playerName to the evaluated hand
             cards: handData.cards,
             ...evaluatedHand, // Attach handType and handStrength
           });
         });
         setDealtCards(newDealtCards);
-
+  
         // Update the evaluatedHands subcollection
         const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
         const evaluatedHandDocRef = doc(evaluatedHandsCollectionRef, playerId);
-
+  
         setDoc(evaluatedHandDocRef, {
           playerId: playerId,
+          playerName: newDealtCards[0].playerName, // Add playerName to the evaluated hand
           evaluatedCards: newDealtCards,
         });
       }
     );
-
+  
     return () => unsubscribe();
-  }, [gameId, playerId]);
+  }, [gameId, playerId]);  
 
   useEffect(() => {
     if (evaluationTriggered && playerCount === evaluatedHandsCount) {
@@ -216,7 +218,7 @@ const Evaluation = () => {
           <p className='handText'>Hand Strength: {hand.handStrength.toFixed(2)}</p>
           {winningHand && (
             <div className='winningHand'>
-              <h2>Winning Hand</h2>
+              <h2>Winning Hand: {winningHand.playerName}</h2>
               <p className='evaluationText'>
                 {winningHand.cards.map((card, cardIndex) => (
                   <p className="cards" key={cardIndex}>

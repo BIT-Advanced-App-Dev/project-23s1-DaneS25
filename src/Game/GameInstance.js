@@ -75,7 +75,7 @@ const GameInstance = () => {
     players.forEach((player) => {
       const cards = shuffledDeck.splice(0, 5);
       const handRef = doc(handsCollectionRef, player.id); // Use the player ID as the document ID in the "hands" subcollection
-      batch.set(handRef, { playerId: player.id, cards });
+      batch.set(handRef, { playerId: player.id, playerName: player.name, cards });
     });
 
     await batch.commit();
