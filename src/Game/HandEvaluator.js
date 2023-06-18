@@ -66,18 +66,37 @@ const determineHandStrength = (handType, cards) => {
     return 4;
   }
   if (handType.startsWith('Two Pair')) {
-    const values = getTwoPairValues(cards);
-    const twoPairValue = values.reduce((acc, cur) => acc + cur, 0); // Sum up the two pair values
-    return 3 + twoPairValue / 100; // Add two pair value to hand strength
-  }
+    const pairValues = getTwoPairValues(cards); // Get the values of the two pairs
+    const remainingValue = cards.find(card => !pairValues.includes(card.value)).value; // Find the value of the remaining card
+  
+    const highestPair = Math.max(...pairValues);
+    const lowestPair = Math.min(...pairValues);
+  
+    const pairStrength = highestPair * 10000 + highestPair * 1000 + lowestPair * 100 + lowestPair * 10; // Calculate the pair strength
+    const remainingStrength = remainingValue * 1; // Calculate the remaining card strength
+  
+    const handStrength = (pairStrength + remainingStrength) / 1000000;
+    return 3 + handStrength;
+  }  
   if (handType.startsWith('One Pair')) {
-    const value = getOnePairValue(cards);
-    const pairStrength = parseFloat(value) / 100; // Divide pair value by 100 and convert to float
-    return 2 + pairStrength; // Add pair value to hand strength
-  }
+    const pairValue = getOnePairValue(cards); // Get the value of the pair
+    const remainingValues = cards
+      .map(card => card.value)
+      .filter(value => value !== pairValue); // Filter out the pair values from the remaining values
+      
+    const pairStrength = pairValue * 10000 + pairValue * 1000; // Calculate the pair strength
+    
+    const remainingStrength = remainingValues
+      .sort((a, b) => b - a)
+      .reduce((acc, cur, index) => acc + cur * Math.pow(10, 2 - index), 0); // Calculate the remaining card strength
+    
+    return 2 + (pairStrength + remainingStrength) / 1000000; // Add pair strength and remaining card strength to the hand strength
+  }   
   if (handType.startsWith('High Card')) {
-    const value = getHighCardValue(cards);
-    return 1 + parseFloat(value) / 100; // Add high card value to hand strength
+    const sortedValues = cards.map(card => card.value).sort((a, b) => b - a); // Sort card values in descending order
+    const highStrength = (sortedValues[0] * 10000 + sortedValues[1] * 1000 + sortedValues[2] * 100 + sortedValues[3] * 10 + sortedValues[4]);
+    const parseHigh = parseFloat(highStrength) / 1000000
+    return 1 + parseHigh; // Format the result to two decimal places
   }
   
   return 0; // Default value for unrecognized hand types
@@ -153,7 +172,7 @@ const getHighCardValue = (cards) => {
 };
 
 const isRoyalFlush = (cards) => {
-  const royalFlushValues = ['A', 'K', 'Q', 'J', '10'];
+  const royalFlushValues = [10, 11, 12, 13, 14];
   const flushCards = cards.filter((card) => card.suit === cards[0].suit);
   if (flushCards.length < 5) {
     return false;

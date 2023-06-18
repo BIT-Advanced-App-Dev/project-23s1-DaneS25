@@ -225,7 +225,7 @@ const Evaluation = () => {
             ))}
           </p>
           <p className='handText'>Hand Type: {hand.handType}</p>
-          <p className='handText'>Hand Strength: {hand.handStrength.toFixed(2)}</p>
+          <p className='handText'>Hand Strength: {hand.handStrength.toFixed(6)}</p>
           {winningHand && (
             <div className='winningHand'>
               <h2>Winning Hand: {winningHand.playerName}</h2>
