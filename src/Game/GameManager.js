@@ -53,7 +53,6 @@ const GameManager = ({ userName }) => {
 
         gamesData.push(updatedGameData);
 
-        // Check if game status is 'started' and navigate players
         if (updatedGameData.status === 'started') {
           navigateToGameInstance(updatedGameData.id);
         }
@@ -102,7 +101,7 @@ const GameManager = ({ userName }) => {
     const gameSnapshot = await getDoc(gameRef);
     const gameData = gameSnapshot.data();
   
-    // Subscribe to real-time updates for the players collection
+    // Subscribe to players collection
     onSnapshot(playersRef, (snapshot) => {
       const playersData = snapshot.docs.map((doc) => doc.data());
   
@@ -133,9 +132,6 @@ const GameManager = ({ userName }) => {
 
     // Update the game status to 'started'
     await updateDoc(gameRef, { status: 'started' });
-
-    // Log the game start
-    console.log(`Game ${gameId} started`);
   };
 
   if (loading) {

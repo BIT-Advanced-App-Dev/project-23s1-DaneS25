@@ -4,6 +4,8 @@ import { doc, getDoc, collection, query, where, onSnapshot, setDoc, writeBatch, 
 import { db, auth } from '../firebase';
 import deck from './Assets/deck.json';
 import "./gameInstance.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const GameInstance = () => {
   const location = useLocation();
@@ -66,15 +68,15 @@ const GameInstance = () => {
 
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: players[0].id });
-    // Create the "hands" subcollection
+    // Create the hands subcollection
     const handsCollectionRef = collection(gameRef, 'hands');
-    await setDoc(doc(handsCollectionRef), {}); // Create an empty document in the "hands" subcollection
+    await setDoc(doc(handsCollectionRef), {});
 
-    const batch = writeBatch(db); // Create a batch instance using writeBatch()
+    const batch = writeBatch(db);
 
     players.forEach((player) => {
       const cards = shuffledDeck.splice(0, 5);
-      const handRef = doc(handsCollectionRef, player.id); // Use the player ID as the document ID in the "hands" subcollection
+      const handRef = doc(handsCollectionRef, player.id);
       batch.set(handRef, { playerId: player.id, playerName: player.name, cards });
     });
 
@@ -107,7 +109,7 @@ const GameInstance = () => {
     
         await updateDoc(handRef, { cards: updatedCards });
       } catch (error) {
-        console.error('Error updating card checked status:', error);
+        toast.error('Error updating card checked status:', error);
       }
     };
   };  
@@ -177,10 +179,10 @@ const GameInstance = () => {
         await batch.commit();
         setSelectedCards([]);
       } catch (error) {
-        console.error('Error updating hand and discarded cards:', error);
+        toast.error('Error updating hand and discarded cards:', error);
       }
     } else {
-      console.error('No valid hand data found.');
+      toast.error('No valid hand data found.');
     }
     // Update the current turn player ID after replacing cards
     const currentPlayerIndex = players.findIndex((player) => player.id === currentPlayer.id);
@@ -194,7 +196,7 @@ const GameInstance = () => {
     }, 3000);
   };
   
-  // Function to shuffle an array using Fisher-Yates algorithm
+  // Function to shuffle an array
   const shuffleArray = (array) => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -215,7 +217,6 @@ const GameInstance = () => {
   };  
 
   useEffect(() => {
-    console.log('Game Ended:', gameEnded);
     if (gameEnded) {
       navigate(`/evaluation?gameId=${gameId}&playerId=${playerId}`);
     }
@@ -223,6 +224,7 @@ const GameInstance = () => {
 
   return (
     <div>
+      <ToastContainer position="top-center" theme="dark" />
       <h1 className='head'>Game Instance</h1>
       <p>Game ID: {gameId}</p>
       <p className='playerName'>Current Player: {currentPlayer.name}</p>

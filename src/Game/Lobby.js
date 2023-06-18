@@ -17,9 +17,7 @@ function Lobby() {
   }, [user, loading, navigate]);
 
   const logout = async () => {
-    console.log("Before sign out");
     await auth.signOut();
-    console.log("After sign out");
     navigate("/");
   };
 
@@ -34,10 +32,9 @@ function Lobby() {
 
         if (!querySnapshot.empty) {
           const userData = querySnapshot.docs[0].data();
-          console.log('User Data:', userData); // Debug statement
           setUserName(userData.name);
         } else {
-          console.log('User document does not exist'); // Debug statement
+          console.log('User document does not exist');
         }
       };
 

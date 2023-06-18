@@ -3,7 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot, doc, setDoc, getDocs, getDoc, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import evaluateHand from './HandEvaluator';
-import "./evaluation.css"
+import "./evaluation.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Evaluation = () => {
   const location = useLocation();
@@ -36,10 +38,8 @@ const Evaluation = () => {
   const createClickCountDocument = async () => {
     const clickCountCollectionRef = collection(db, 'games', gameId, 'clickCount');
     const newClickCountDocRef = doc(clickCountCollectionRef);
-
-    // Create a new document with a count variable
     await setDoc(newClickCountDocRef, {
-      count: 1 // Set the initial count to 1
+      count: 1
     });
 
     console.log('New clickCount document created');
@@ -97,28 +97,26 @@ const Evaluation = () => {
         const newDealtCards = [];
         snapshot.forEach((doc) => {
           const handData = doc.data();
-          const evaluatedHand = evaluateHand(handData.cards); // Evaluate the hand
+          const evaluatedHand = evaluateHand(handData.cards);
           newDealtCards.push({
             playerId: handData.playerId,
-            playerName: handData.playerName, // Add playerName to the evaluated hand
+            playerName: handData.playerName,
             cards: handData.cards,
-            ...evaluatedHand, // Attach handType and handStrength
+            ...evaluatedHand,
           });
         });
         setDealtCards(newDealtCards);
   
-        // Update the evaluatedHands subcollection
         const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
         const evaluatedHandDocRef = doc(evaluatedHandsCollectionRef, playerId);
   
         setDoc(evaluatedHandDocRef, {
           playerId: playerId,
-          playerName: newDealtCards[0].playerName, // Add playerName to the evaluated hand
+          playerName: newDealtCards[0].playerName,
           evaluatedCards: newDealtCards,
         });
       }
     );
-  
     return () => unsubscribe();
   }, [gameId, playerId]);  
 
@@ -126,12 +124,10 @@ const Evaluation = () => {
     if (evaluationTriggered && playerCount === evaluatedHandsCount) {
       const evaluateHands = async () => {
         const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
-
-        // Query all evaluated hands
         const evaluatedHandsSnapshot = await getDocs(evaluatedHandsCollectionRef);
 
         if (evaluatedHandsSnapshot.empty) {
-          console.log('Evaluated hands subcollection is empty');
+          toast.error('Evaluated hands subcollection is empty');
           return;
         }
 
@@ -142,7 +138,7 @@ const Evaluation = () => {
           const evaluatedCards = evaluatedHandData.evaluatedCards;
 
           if (!evaluatedCards || evaluatedCards.length === 0) {
-            console.log('Evaluated cards data is missing for', doc.id);
+            toast.error('Evaluated cards data is missing for', doc.id);
             return;
           }
 
@@ -185,12 +181,13 @@ const Evaluation = () => {
       // Navigate the current player to '/lobby'
       await navigate('/lobby');
     } catch (error) {
-      console.log('Error navigating to the lobby:', error);
+      toast.error('Error navigating to the lobby:', error);
     }
   }; 
 
   return (
     <div>
+      <ToastContainer position="top-center" theme="dark" />
       <h1 className='head'>Evaluation</h1>
       {!evaluationTriggered && playerCount === evaluatedHandsCount && (
         <button className='evaluateButton' onClick={() => {
