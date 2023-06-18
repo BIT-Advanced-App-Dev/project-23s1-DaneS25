@@ -266,4 +266,5 @@ const isOnePair = (cards) => {
   return false;
 };
 
+export { evaluateHand, isRoyalFlush };
 export default evaluateHand;
