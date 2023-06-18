@@ -6,6 +6,7 @@ import evaluateHand from './HandEvaluator';
 import "./evaluation.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { RingLoader } from 'react-spinners';
 
 const Evaluation = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const Evaluation = () => {
   const [evaluatedHandsCount, setEvaluatedHandsCount] = useState(0);
   const [clickCount, setClickCount] = useState(0);
   const [isGameCreator, setIsGameCreator] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchGameCreator = async () => {
@@ -162,26 +164,29 @@ const Evaluation = () => {
   }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount, clickCount]);
 
   const handleExit = async () => {
-    try { 
+    try {
+      setLoading(true);
       const playersCollectionRef = collection(db, 'games', gameId, 'players');
       const playersSnapshot = await getDocs(playersCollectionRef);
-  
+
       const navigationPromises = playersSnapshot.docs.map(async (doc) => {
         const player = doc.data();
         const playerId = player.playerId;
         await navigate(`/lobby?playerId=${playerId}`);
       });
-  
+
       await Promise.all(navigationPromises);
-  
+
       // Delete the game document
       const gameDocRef = doc(collection(db, 'games'), gameId);
       await deleteDoc(gameDocRef);
-  
+
       // Navigate the current player to '/lobby'
       await navigate('/lobby');
     } catch (error) {
       toast.error('Error navigating to the lobby:', error);
+    } finally {
+      setLoading(false);
     }
   }; 
 
@@ -195,11 +200,19 @@ const Evaluation = () => {
           createClickCountDocument();
         }}>Evaluate</button>
       )}
-      {isGameCreator && playerCount === clickCount && (
-        <button className='exitButton' onClick={handleExit}>Exit</button>
-      )}
-      {!isGameCreator && playerCount === clickCount && (
-        <button className='exitButton' onClick={handleExit}>Exit</button>
+      {loading ? (
+      <div className="spinner-container">
+        <RingLoader color="#123abc" size={30} />
+      </div>
+      ) : (
+        <>
+          {isGameCreator && playerCount === clickCount && (
+            <button className='exitButton' onClick={handleExit}>Exit</button>
+          )}
+          {!isGameCreator && playerCount === clickCount && (
+            <button className='exitButton' onClick={handleExit}>Exit</button>
+          )}
+        </>
       )}
       {dealtCards.map((hand, index) => (
         <div key={index}>

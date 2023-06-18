@@ -6,6 +6,7 @@ import deck from './Assets/deck.json';
 import "./gameInstance.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { RingLoader } from 'react-spinners';
 
 const GameInstance = () => {
   const location = useLocation();
@@ -21,6 +22,7 @@ const GameInstance = () => {
   const [selectedCards, setSelectedCards] = useState([]);
   const [currentTurnPlayerId, setCurrentTurnPlayerId] = useState(null);
   const [gameEnded, setGameEnded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchGameCreator = async () => {
@@ -64,8 +66,8 @@ const GameInstance = () => {
   }, [gameId]);
 
   const dealCards = async () => {
+    setIsLoading(true);
     const shuffledDeck = [...deck].sort(() => Math.random() - 0.5);
-
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: players[0].id });
     // Create the hands subcollection
@@ -81,6 +83,7 @@ const GameInstance = () => {
     });
 
     await batch.commit();
+    setIsLoading(false);
   };
 
   const handleDealClick = () => {
@@ -230,37 +233,63 @@ const GameInstance = () => {
       <p className='playerName'>Current Player: {currentPlayer.name}</p>
       {isGameCreator && (
         <div>
-          <button className='dealButton' onClick={handleDealClick}>Deal Cards</button>
+          {isLoading ? (
+            <div className="spinner-container">
+              <RingLoader color="#123abc" size={30} />
+            </div>
+          ) : (
+            <button className="dealButton" onClick={handleDealClick}>
+              Deal Cards
+            </button>
+          )}
         </div>
       )}
       <p className='turn'>Your Cards:</p>
         <div className="cards-container">
-          {dealtCards.map((dealt) => {
-            if (dealt.player === playerId) {
-              return (
-                <div key={dealt.player}>
-                  <ul>
-                    {dealt.cards.map((card) => (
-                      <span
-                        className="cards"
-                        key={card.id}
-                        style={{ backgroundColor: selectedCards.includes(card.id) ? 'hsl(219, 92%, 53%)' : '#5ad9f3' }}
-                        onClick={() => handleCardClick(card.id)}
-                      >
-                        {`${card.name} of ${card.suit}`}
-                      </span>
-                    ))}
-                  </ul>
-                </div>
-              );
-            }
-            return null;
-          })}
+        {dealtCards.map((dealt) => {
+          if (dealt.player === playerId) {
+            return (
+              <div key={dealt.player}>
+                <ul>
+                  {dealt.cards.map((card) => (
+                    <span
+                      className="cards"
+                      key={card.id}
+                      style={{
+                        backgroundColor: selectedCards.includes(card.id)
+                          ? 'hsl(219, 92%, 53%)'
+                          : '#5ad9f3',
+                      }}
+                      onClick={() => handleCardClick(card.id)}
+                    >
+                      {isLoading ? (
+                      <div className="spinner-container">
+                        <RingLoader color="#123abc" size={50} />
+                      </div>
+                      ) : (
+                        `${card.name} of ${card.suit}`
+                      )}
+                    </span>
+                  ))}
+                </ul>
+              </div>
+            );
+          }
+          return null;
+        })}
         </div>
       {currentPlayer.id === currentTurnPlayerId && (
         <div>
           <p className='turn'>It is now your turn!</p>
-          <button className='replaceButton' onClick={handleReplaceClick}>Replace Cards</button>
+          {selectedCards.length > 0 ? (
+            <button className='replaceButton' onClick={handleReplaceClick}>
+              Replace Cards
+            </button>
+          ) : (
+            <button className='replaceButton' disabled>
+              Replace Cards
+            </button>
+          )}
           <button className='passButton' onClick={handlePassClick}>Pass</button>
         </div>
       )}
