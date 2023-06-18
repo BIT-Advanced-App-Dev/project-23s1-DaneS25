@@ -4,6 +4,8 @@ import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs } from 
 import { RingLoader } from 'react-spinners';
 import { useNavigate } from 'react-router-dom';
 import "./gameManager.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const GameManager = ({ userName }) => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -77,6 +79,7 @@ const GameManager = ({ userName }) => {
     const gameRef = await addDoc(collection(db, 'games'), {
       creator: user.uid,
       status: 'waiting',
+      maxPlayers: 5,
     });
 
     // Retrieve the generated game ID
@@ -90,35 +93,40 @@ const GameManager = ({ userName }) => {
       setErrorMessage('You need to log in to join a group.');
       return;
     }
-
+  
     const gameRef = doc(db, 'games', gameId);
     const playersRef = collection(gameRef, 'players');
-
+  
     await addDoc(playersRef, { userId: user.uid, userName: userName });
-
+  
     const gameSnapshot = await getDoc(gameRef);
     const gameData = gameSnapshot.data();
-
+  
     // Subscribe to real-time updates for the players collection
     onSnapshot(playersRef, (snapshot) => {
       const playersData = snapshot.docs.map((doc) => doc.data());
-
+  
       const updatedGame = {
         id: gameId,
         ...gameData,
         players: playersData,
       };
-
+  
       setGames((prevGames) => {
         const updatedGames = prevGames.map((game) =>
           game.id === updatedGame.id ? updatedGame : game
         );
         return updatedGames;
       });
+  
+      if (!updatedGame || updatedGame.players.length >= 5) {
+        toast.success('This game is full.');
+        return;
+      }
     });
-
+  
     console.log(`User ${user.uid} joined game ${gameId}`);
-  };
+  };     
 
   const startGame = async (gameId) => {
     const gameRef = doc(db, 'games', gameId);
@@ -147,6 +155,7 @@ const GameManager = ({ userName }) => {
 
   return (
     <div>
+      <ToastContainer position="top-center" theme="dark" />
       <button className='createButton' onClick={createGame}>Create Game</button>
       {games.map((game) => (
         <div key={game.id}>
@@ -155,7 +164,11 @@ const GameManager = ({ userName }) => {
 
           {game.status === 'waiting' && (
             <>
-              <button className='joinButton' onClick={() => joinGame(game.id)}>Join Game</button>
+              {game.players.length >= 5 ? (
+                <button className='joinButton' disabled>Game Full</button>
+              ) : (
+                <button className='joinButton' onClick={() => joinGame(game.id)}>Join Game</button>
+              )}
               <p className='players'>Players: {game.players.map((player) => player.userName).join(', ')}</p>
             </>
           )}
