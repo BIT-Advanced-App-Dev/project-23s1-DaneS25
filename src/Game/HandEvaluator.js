@@ -48,22 +48,52 @@ const determineHandStrength = (handType, cards) => {
     return 10;
   }
   if (handType === 'Straight Flush') {
-    return 9;
+    const sortedValues = cards.map(card => card.value).sort((a, b) => b - a);
+    const straightFlushStrength = sortedValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, index), 0);
+    return 9 + straightFlushStrength / 1000000;
   }
   if (handType.startsWith('Four of a Kind')) {
-    return 8;
+    const value = getFourOfAKindValue(cards);
+    const fourOfAKindStrength = value * 10000 + value * 1000 + value * 100 + value * 10; // Calculation for four of a kind hand
+    const remainingValues = cards
+      .map(card => card.value)
+      .filter(cardValue => cardValue !== value)
+      .sort((a, b) => b - a);
+    const remainingStrength = remainingValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, 1 - index), 0);
+    return 8 + (fourOfAKindStrength + remainingStrength) / 1000000;
   }
   if (handType.startsWith('Full House')) {
-    return 7;
+    const value = getFullHouseValue(cards);
+    const threeOfAKindValue = value.split(' and ')[0];
+    const pairValue = value.split(' and ')[1];
+    const fullHouseStrength = threeOfAKindValue * 10000 + threeOfAKindValue * 1000 + threeOfAKindValue * 100 + pairValue * 10 + pairValue * 1;
+    return 7 + fullHouseStrength / 1000000;
   }
   if (handType === 'Flush') {
-    return 6;
+    const sortedValues = cards.map(card => card.value).sort((a, b) => b - a);
+    const flushStrength = sortedValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, index), 0);
+    return 6 + flushStrength / 1000000;
   }
   if (handType === 'Straight') {
-    return 5;
+    const sortedValues = cards.map(card => card.value).sort((a, b) => b - a);
+    const straightStrength = sortedValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, index), 0);
+    return 5 + straightStrength / 1000000;
   }
   if (handType.startsWith('Three of a Kind')) {
-    return 4;
+    const threeOfAKindValue = getThreeOfAKindValue(cards); // Get the value of the three of a kind
+
+    const threeOfAKindStrength = threeOfAKindValue * 1000 + threeOfAKindValue * 1000 + threeOfAKindValue * 100; // Calculate the three of a kind strength
+
+    const remainingValues = cards
+      .map(card => card.value)
+      .filter(value => value !== threeOfAKindValue) // Filter out the three of a kind value from the remaining values
+      .sort((a, b) => b - a); // Sort the remaining values in descending order
+
+    const remainingStrength = remainingValues
+      .reduce((acc, cur, index) => acc + cur * Math.pow(10, 1 - index), 0); // Calculate the remaining card strength
+
+    const handStrength = (threeOfAKindStrength + remainingStrength) / 1000000;
+    return 4 + handStrength;
   }
   if (handType.startsWith('Two Pair')) {
     const pairValues = getTwoPairValues(cards); // Get the values of the two pairs
@@ -200,11 +230,10 @@ const isFourOfAKind = (cards) => {
   for (let i = 0; i < cards.length; i++) {
     const value = cards[i].value;
     valueCounts[value] = valueCounts[value] ? valueCounts[value] + 1 : 1;
-    if (valueCounts[value] === 4) {
-      return true;
-    }
   }
-  return false;
+
+  const counts = Object.values(valueCounts);
+  return counts.includes(4);
 };
 
 const isFullHouse = (cards) => {
@@ -223,12 +252,14 @@ const isFlush = (cards) => {
 };
 
 const isStraight = (cards) => {
-  const sortedCards = cards.sort((a, b) => a.value - b.value);
+  const sortedCards = [...cards].sort((a, b) => a.value - b.value);
+
   for (let i = 0; i < sortedCards.length - 1; i++) {
     if (sortedCards[i].value + 1 !== sortedCards[i + 1].value) {
       return false;
     }
   }
+
   return true;
 };
 
@@ -237,11 +268,9 @@ const isThreeOfAKind = (cards) => {
   for (let i = 0; i < cards.length; i++) {
     const value = cards[i].value;
     valueCounts[value] = valueCounts[value] ? valueCounts[value] + 1 : 1;
-    if (valueCounts[value] === 3) {
-      return true;
-    }
   }
-  return false;
+  const counts = Object.values(valueCounts);
+  return counts.includes(3) && !counts.includes(2);
 };
 
 const isTwoPair = (cards) => {
@@ -259,12 +288,20 @@ const isOnePair = (cards) => {
   for (let i = 0; i < cards.length; i++) {
     const value = cards[i].value;
     valueCounts[value] = valueCounts[value] ? valueCounts[value] + 1 : 1;
-    if (valueCounts[value] === 2) {
-      return true;
-    }
   }
-  return false;
+
+  const pairs = Object.values(valueCounts).filter(count => count === 2);
+  return pairs.length === 1;
 };
 
-export { evaluateHand, isRoyalFlush };
+export { evaluateHand,
+         isRoyalFlush,
+         isThreeOfAKind, 
+         isStraightFlush, 
+         isFullHouse, 
+         isFourOfAKind, 
+         isFlush, 
+         isStraight, 
+         isOnePair, 
+         isTwoPair };
 export default evaluateHand;
