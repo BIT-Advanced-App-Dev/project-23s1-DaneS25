@@ -127,38 +127,49 @@ const Evaluation = () => {
       const evaluateHands = async () => {
         const evaluatedHandsCollectionRef = collection(db, 'games', gameId, 'evaluatedHands');
         const evaluatedHandsSnapshot = await getDocs(evaluatedHandsCollectionRef);
-
+  
         if (evaluatedHandsSnapshot.empty) {
           toast.error('Evaluated hands subcollection is empty');
           return;
         }
-
+  
         let highestHand = null;
-
+        let secondHighestHand = null;
+        let isDraw = false;
+  
         evaluatedHandsSnapshot.forEach((doc) => {
           const evaluatedHandData = doc.data();
           const evaluatedCards = evaluatedHandData.evaluatedCards;
-
+  
           if (!evaluatedCards || evaluatedCards.length === 0) {
             toast.error('Evaluated cards data is missing for', doc.id);
             return;
           }
-
+  
           evaluatedCards.forEach((hand) => {
             if (!highestHand || hand.handStrength > highestHand.handStrength) {
+              secondHighestHand = highestHand;
               highestHand = hand;
+              isDraw = false;
+            } else if (!secondHighestHand || hand.handStrength > secondHighestHand.handStrength) {
+              secondHighestHand = hand;
+              isDraw = false;
+            } else if (hand.handStrength === highestHand.handStrength || hand.handStrength === secondHighestHand.handStrength) {
+              isDraw = true;
             }
           });
         });
-
-        if (highestHand) {
+  
+        if (isDraw) {
+          console.log("It's a draw!");
+        } else if (highestHand) {
           setWinningHand(highestHand);
           console.log('Hand with highest handStrength:', highestHand);
         } else {
           console.log('No evaluated hands found');
         }
       };
-
+  
       evaluateHands();
     }
   }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount, clickCount]);
