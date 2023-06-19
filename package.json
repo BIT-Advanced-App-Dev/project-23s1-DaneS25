@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@babel/preset-react": "^7.22.5",
+    "fake-indexeddb": "^4.0.1",
     "jest": "^27.5.1"
   }
 }
