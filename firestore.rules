@@ -1,9 +1,55 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2023, 6, 23);
+    // Allow authorized users to read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allow all users to read the user collection
+    match /users/{userId} {
+      allow read;
+    }
+
+    // Allow authorized users to create a game document
+    match /games/{gameId} {
+      allow create: if request.auth != null;
+
+      // Allow authorized users to update and delete the game document
+      allow update, delete: if request.auth != null;
+
+      // Allow all users to read the game document
+      allow read;
+
+      // Subcollection-level rules
+      match /players/{playerId} {
+        allow read;
+        allow write: if request.auth != null;
+      }
+
+      // Allow read and write access to the hands subcollection
+      match /hands/{handId} {
+        allow read, write: if request.auth != null
+                          && exists(/databases/$(database)/documents/games/$(gameId));
+      }
+
+      // Allow read and write access to the discardedCards subcollection
+      match /discardedCards/{discardedCardsId} {
+        allow read, write: if request.auth != null
+                          && exists(/databases/$(database)/documents/games/$(gameId));
+      }
+
+      // Allow read and write access to the evaluatedHands subcollection
+      match /evaluatedHands/{evaluatedHandsId} {
+        allow read, write: if request.auth != null
+                          && exists(/databases/$(database)/documents/games/$(gameId));
+      }
+
+      // Allow read and write access to the clickCount subcollection
+      match /clickCount/{clickCountId} {
+        allow read, write: if request.auth != null
+                          && exists(/databases/$(database)/documents/games/$(gameId));
+      }
     }
   }
 }

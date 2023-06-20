@@ -9,6 +9,7 @@ import "./lobby.css";
 function Lobby() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
+  const [loadingUserName, setLoadingUserName] = useState(true); 
   const [userName, setUserName] = useState("");
   
   useEffect(() => {
@@ -36,6 +37,8 @@ function Lobby() {
         } else {
           console.log('User document does not exist');
         }
+
+        setLoadingUserName(false);
       };
 
       getUserData();
@@ -60,7 +63,7 @@ function Lobby() {
       </button>
       <div className="userDetails">
         Logged in as
-        <div>{userName}</div>
+        <div>{loadingUserName ? "Loading..." : userName}</div>
       </div>
       <GameManager userName={userName} />
     </div>
