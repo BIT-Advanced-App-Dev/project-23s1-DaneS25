@@ -23,6 +23,7 @@ const GameInstance = () => {
   const [currentTurnPlayerId, setCurrentTurnPlayerId] = useState(null);
   const [gameEnded, setGameEnded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [dealButtonDisabled, setDealButtonDisabled] = useState(false);
 
   useEffect(() => {
     const fetchGameCreator = async () => {
@@ -67,6 +68,7 @@ const GameInstance = () => {
 
   const dealCards = async () => {
     setIsLoading(true);
+    setDealButtonDisabled(true);
     const shuffledDeck = [...deck].sort(() => Math.random() - 0.5);
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: players[0].id });
@@ -238,7 +240,11 @@ const GameInstance = () => {
               <RingLoader color="#123abc" size={30} />
             </div>
           ) : (
-            <button className="dealButton" onClick={handleDealClick}>
+            <button
+              className="dealButton"
+              onClick={handleDealClick}
+              disabled={dealButtonDisabled} // Disable the button based on the state
+            >
               Deal Cards
             </button>
           )}

@@ -22,6 +22,8 @@ const Evaluation = () => {
   const [clickCount, setClickCount] = useState(0);
   const [isGameCreator, setIsGameCreator] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [draw, setDraw] = useState(false);
+  const [drawPlayers, setDrawPlayers] = useState([]);
 
   useEffect(() => {
     const fetchGameCreator = async () => {
@@ -134,36 +136,38 @@ const Evaluation = () => {
         }
   
         let highestHand = null;
-        let secondHighestHand = null;
         let isDraw = false;
-  
+        let drawPlayers = [];
+        
         evaluatedHandsSnapshot.forEach((doc) => {
           const evaluatedHandData = doc.data();
           const evaluatedCards = evaluatedHandData.evaluatedCards;
-  
+        
           if (!evaluatedCards || evaluatedCards.length === 0) {
             toast.error('Evaluated cards data is missing for', doc.id);
             return;
           }
-  
+        
           evaluatedCards.forEach((hand) => {
             if (!highestHand || hand.handStrength > highestHand.handStrength) {
-              secondHighestHand = highestHand;
               highestHand = hand;
               isDraw = false;
-            } else if (!secondHighestHand || hand.handStrength > secondHighestHand.handStrength) {
-              secondHighestHand = hand;
-              isDraw = false;
-            } else if (hand.handStrength === highestHand.handStrength || hand.handStrength === secondHighestHand.handStrength) {
+              drawPlayers = [hand.playerName];
+            } else if (hand.handStrength === highestHand.handStrength) {
               isDraw = true;
+              drawPlayers.push(hand.playerName); // Use push to add names to the drawPlayers array
             }
           });
         });
-  
+        
         if (isDraw) {
-          console.log("It's a draw!");
+          setWinningHand(null);
+          setDraw(true);
+          setDrawPlayers(drawPlayers);
+          console.log('Draw players:', drawPlayers);
         } else if (highestHand) {
           setWinningHand(highestHand);
+          setDraw(false);
           console.log('Hand with highest handStrength:', highestHand);
         } else {
           console.log('No evaluated hands found');
@@ -172,7 +176,7 @@ const Evaluation = () => {
   
       evaluateHands();
     }
-  }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount, clickCount]);
+  }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount, clickCount]);  
 
   const handleExit = async () => {
     try {
@@ -250,6 +254,14 @@ const Evaluation = () => {
               </p>
               <p className='handText'>Hand Type: {winningHand.handType}</p>
               <p className='handText'>Hand Strength: {winningHand.handStrength.toFixed(2)}</p>
+            </div>
+          )}
+          {draw && (
+            <div>
+              <p className="drawMessage">It was a draw between:</p>
+              {drawPlayers.map((player, index) => (
+                <p key={index}>{player}</p>
+              ))}
             </div>
           )}
         </div>

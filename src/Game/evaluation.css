@@ -48,3 +48,7 @@
     background-color: hsl(219, 92%, 53%);
     cursor: pointer;
 }
+.drawMessage {
+    margin-top: 20px;
+    font-size: 20px;
+}
