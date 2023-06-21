@@ -25,7 +25,7 @@ describe('Firestore security rules', () => {
   beforeAll(async () => {
     // Initialize the Firebase app
     firebase.initializeApp({
-      projectId: 'dane-poker', // Replace with your project ID
+      projectId: 'dane-poker',
     });
     // Initialize the Firestore emulator
     await initializeTestEnvironment({ projectId: 'dane-poker', firestore });

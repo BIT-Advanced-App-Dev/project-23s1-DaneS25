@@ -25,6 +25,7 @@ const GameInstance = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dealButtonDisabled, setDealButtonDisabled] = useState(false);
 
+  // Fetch the game creator user
   useEffect(() => {
     const fetchGameCreator = async () => {
       const gameRef = doc(db, 'games', gameId);
@@ -39,6 +40,7 @@ const GameInstance = () => {
     fetchGameCreator();
   }, [gameId]);
 
+  // Fetch the hands collections and update them with new cards from replace cards function
   useEffect(() => {
     const handsCollectionRef = collection(db, 'games', gameId, 'hands');
     const unsubscribe = onSnapshot(
@@ -66,9 +68,11 @@ const GameInstance = () => {
     return () => unsubscribe();
   }, [gameId]);
 
+  // Deal the initial hands of cards to players
   const dealCards = async () => {
     setIsLoading(true);
     setDealButtonDisabled(true);
+    // Shuffle the cards
     const shuffledDeck = [...deck].sort(() => Math.random() - 0.5);
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: players[0].id });
@@ -76,6 +80,7 @@ const GameInstance = () => {
     const handsCollectionRef = collection(gameRef, 'hands');
     await setDoc(doc(handsCollectionRef), {});
 
+    // Use writeBatch to write all the hands collections for all players at once
     const batch = writeBatch(db);
 
     players.forEach((player) => {
@@ -83,15 +88,17 @@ const GameInstance = () => {
       const handRef = doc(handsCollectionRef, player.id);
       batch.set(handRef, { playerId: player.id, playerName: player.name, cards });
     });
-
+    // Commit the hands for all the players to the hands collections
     await batch.commit();
     setIsLoading(false);
   };
 
+  // Trigger for dealing the cards
   const handleDealClick = () => {
     dealCards();
   };
 
+  // Handle the cards selected for replacement
   const handleCardClick = async (cardId) => {
     if (currentPlayer.id === currentTurnPlayerId) {
       if (selectedCards.includes(cardId)) {
@@ -119,11 +126,13 @@ const GameInstance = () => {
     };
   };  
 
+  // Replace selected cards with new cards 
   const handleReplaceClick = async () => {
     const handRef = doc(db, 'games', gameId, 'hands', currentPlayer.id);
     const handSnapshot = await getDoc(handRef);
     const handData = handSnapshot.data();
   
+    // Get all the selected cards from the hand that are to be replaced
     if (handSnapshot.exists() && handData && handData.cards) {
       const remainingCards = handData.cards.filter((card) => !selectedCards.includes(card.id));
   
@@ -196,6 +205,7 @@ const GameInstance = () => {
   
     const gameRef = doc(db, 'games', gameId);
     await updateDoc(gameRef, { currentTurnPlayerId: nextPlayerId });
+    // Give the player 3 seconds after replacing their cards to see the new cards in their hand
     setTimeout(() => {
       setGameEnded(true);
     }, 3000);
@@ -211,6 +221,7 @@ const GameInstance = () => {
     return newArray;
   };
   
+  // Skip to the next players turn if the current turn player clicks 'pass' button
   const handlePassClick = async () => {
     const currentPlayerIndex = players.findIndex((player) => player.id === currentPlayer.id);
     const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
@@ -221,6 +232,7 @@ const GameInstance = () => {
     setGameEnded(true);
   };  
 
+  // Navigate to the evaluation screen after player takes a turn
   useEffect(() => {
     if (gameEnded) {
       navigate(`/evaluation?gameId=${gameId}&playerId=${playerId}`);
@@ -273,7 +285,7 @@ const GameInstance = () => {
                         <RingLoader color="#123abc" size={50} />
                       </div>
                       ) : (
-                        `${card.name} of ${card.suit}`
+                        `${card.name} of ${card.suit}` // Display the players cards
                       )}
                     </span>
                   ))}

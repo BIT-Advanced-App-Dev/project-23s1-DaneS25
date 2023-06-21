@@ -14,6 +14,7 @@ const GameManager = ({ userName }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // UseEffect that creates GameInstance URl and navigates all players in the game to it 
   useEffect(() => {
     const navigateToGameInstance = (gameId) => {
       const gameRef = doc(db, 'games', gameId);
@@ -68,10 +69,11 @@ const GameManager = ({ userName }) => {
     return () => unsubscribe();
   }, [navigate]);
 
+  // Allow create game if user is authenticated
   const createGame = async () => {
     const user = auth.currentUser;
     if (!user) {
-      // Handle case where user is not authenticated
+      toast.error('User not authenticated.');
       return;
     }
 
@@ -86,16 +88,17 @@ const GameManager = ({ userName }) => {
     console.log('Created game with ID:', gameId);
   };
 
+  // Make sure only authenticated users can join a game
   const joinGame = async (gameId) => {
     const user = auth.currentUser;
     if (!user) {
-      setErrorMessage('You need to log in to join a group.');
+      setErrorMessage('You need to log in to join a game.');
       return;
     }
   
     const gameRef = doc(db, 'games', gameId);
     const playersRef = collection(gameRef, 'players');
-  
+    // Create players subcollection in games doc
     await addDoc(playersRef, { userId: user.uid, userName: userName });
   
     const gameSnapshot = await getDoc(gameRef);
@@ -117,7 +120,7 @@ const GameManager = ({ userName }) => {
         );
         return updatedGames;
       });
-  
+      // Check if game has maximum players in it
       if (!updatedGame || updatedGame.players.length >= 5) {
         toast.success('This game is full.');
         return;
@@ -134,6 +137,7 @@ const GameManager = ({ userName }) => {
     await updateDoc(gameRef, { status: 'started' });
   };
 
+  // If loading set ring loader to wait until loading data is completed
   if (loading) {
     document.body.style.overflow = 'hidden';
     return (

@@ -1,10 +1,13 @@
 const evaluateHand = (cards) => {
+  // Determine the hand type
   const handType = determineHandType(cards);
+  // Determine the strength of the hand based on the type
   const handStrength = determineHandStrength(handType, cards);
 
   return { handType, handStrength };
 };
 
+// Determine the name of the hand type
 const determineHandType = (cards) => {
   if (isRoyalFlush(cards)) {
     return 'Royal Flush';
@@ -43,15 +46,18 @@ const determineHandType = (cards) => {
   return `High Card (${value})`;
 };
 
+ // Calculate the strength of the hand based on the hand type and the cards
 const determineHandStrength = (handType, cards) => {
   if (handType === 'Royal Flush') {
     return 10;
   }
+  // Calculate the strength of a Straight Flush
   if (handType === 'Straight Flush') {
     const sortedValues = cards.map(card => card.value).sort((a, b) => b - a);
     const straightFlushStrength = sortedValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, index), 0);
     return 9 + straightFlushStrength / 1000000;
   }
+  // Calculate the strength of a Four Of A Kind
   if (handType.startsWith('Four of a Kind')) {
     const value = getFourOfAKindValue(cards);
     const fourOfAKindStrength = value * 10000 + value * 1000 + value * 100 + value * 10; // Calculation for four of a kind hand
@@ -62,6 +68,7 @@ const determineHandStrength = (handType, cards) => {
     const remainingStrength = remainingValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, 1 - index), 0);
     return 8 + (fourOfAKindStrength + remainingStrength) / 1000000;
   }
+  // Calculate the strength of a Full House
   if (handType.startsWith('Full House')) {
     const value = getFullHouseValue(cards);
     const threeOfAKindValue = value.split(' and ')[0];
@@ -69,16 +76,19 @@ const determineHandStrength = (handType, cards) => {
     const fullHouseStrength = threeOfAKindValue * 10000 + threeOfAKindValue * 1000 + threeOfAKindValue * 100 + pairValue * 10 + pairValue * 1;
     return 7 + fullHouseStrength / 1000000;
   }
+  // Calculate the strength of a Flush
   if (handType === 'Flush') {
     const sortedValues = cards.map(card => card.value).sort((a, b) => b - a);
     const flushStrength = sortedValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, index), 0);
     return 6 + flushStrength / 1000000;
   }
+  // Calculate the strength of a Straight
   if (handType === 'Straight') {
     const sortedValues = cards.map(card => card.value).sort((a, b) => b - a);
     const straightStrength = sortedValues.reduce((acc, cur, index) => acc + cur * Math.pow(10, index), 0);
     return 5 + straightStrength / 1000000;
   }
+  // Calculate the strength of a Three Of A Kind
   if (handType.startsWith('Three of a Kind')) {
     const threeOfAKindValue = getThreeOfAKindValue(cards); // Get the value of the three of a kind
 
@@ -95,6 +105,7 @@ const determineHandStrength = (handType, cards) => {
     const handStrength = (threeOfAKindStrength + remainingStrength) / 1000000;
     return 4 + handStrength;
   }
+  // Calculate the strength of a Two Pair
   if (handType.startsWith('Two Pair')) {
     const pairValues = getTwoPairValues(cards); // Get the values of the two pairs
     const remainingValue = cards.find(card => !pairValues.includes(card.value)).value; // Find the value of the remaining card
@@ -107,7 +118,8 @@ const determineHandStrength = (handType, cards) => {
   
     const handStrength = (pairStrength + remainingStrength) / 1000000;
     return 3 + handStrength;
-  }  
+  }
+  // Calculate the strength of a One Pair  
   if (handType.startsWith('One Pair')) {
     const pairValue = getOnePairValue(cards); // Get the value of the pair
     const remainingValues = cards
@@ -121,7 +133,8 @@ const determineHandStrength = (handType, cards) => {
       .reduce((acc, cur, index) => acc + cur * Math.pow(10, 2 - index), 0); // Calculate the remaining card strength
     
     return 2 + (pairStrength + remainingStrength) / 1000000; // Add pair strength and remaining card strength to the hand strength
-  }   
+  }
+  // Calculate the strength of a High Card   
   if (handType.startsWith('High Card')) {
     const sortedValues = cards.map(card => card.value).sort((a, b) => b - a); // Sort card values in descending order
     const highStrength = (sortedValues[0] * 10000 + sortedValues[1] * 1000 + sortedValues[2] * 100 + sortedValues[3] * 10 + sortedValues[4]);
@@ -201,6 +214,7 @@ const getHighCardValue = (cards) => {
   return highestValue;
 };
 
+// Check hand values and suits to match Royal Flush
 const isRoyalFlush = (cards) => {
   const royalFlushValues = [10, 11, 12, 13, 14];
   const flushCards = cards.filter((card) => card.suit === cards[0].suit);
@@ -210,7 +224,7 @@ const isRoyalFlush = (cards) => {
   const flushCardValues = flushCards.map((card) => card.value);
   return royalFlushValues.every((value) => flushCardValues.includes(value));
 };
-
+// Check hand values and suits to match Straight Flush
 const isStraightFlush = (cards) => {
   const flushCards = cards.filter((card) => card.suit === cards[0].suit);
   if (flushCards.length < 5) {
@@ -224,7 +238,7 @@ const isStraightFlush = (cards) => {
   }
   return true;
 };
-
+// Check values in hand for 4 matching values
 const isFourOfAKind = (cards) => {
   const valueCounts = {};
   for (let i = 0; i < cards.length; i++) {
@@ -235,7 +249,7 @@ const isFourOfAKind = (cards) => {
   const counts = Object.values(valueCounts);
   return counts.includes(4);
 };
-
+// Check values in hand for 3 matching values and 2 matching values
 const isFullHouse = (cards) => {
   const valueCounts = {};
   for (let i = 0; i < cards.length; i++) {
@@ -245,12 +259,12 @@ const isFullHouse = (cards) => {
   const values = Object.values(valueCounts);
   return values.includes(3) && values.includes(2);
 };
-
+// Check suits in hand, if they are all the same
 const isFlush = (cards) => {
   const suit = cards[0].suit;
   return cards.every((card) => card.suit === suit);
 };
-
+// Sort cards in desc order and then check if they are consecutive 
 const isStraight = (cards) => {
   const sortedCards = [...cards].sort((a, b) => a.value - b.value);
 
@@ -262,7 +276,7 @@ const isStraight = (cards) => {
 
   return true;
 };
-
+// Check if same value is in hand 3 times
 const isThreeOfAKind = (cards) => {
   const valueCounts = {};
   for (let i = 0; i < cards.length; i++) {
@@ -272,7 +286,7 @@ const isThreeOfAKind = (cards) => {
   const counts = Object.values(valueCounts);
   return counts.includes(3) && !counts.includes(2);
 };
-
+// Check if 2 matching values in hand twice, check if they dont match
 const isTwoPair = (cards) => {
   const valueCounts = {};
   for (let i = 0; i < cards.length; i++) {
@@ -282,7 +296,7 @@ const isTwoPair = (cards) => {
   const pairs = Object.values(valueCounts).filter((count) => count === 2);
   return pairs.length === 2;
 };
-
+// Check if any 2 values in hand match and other cards dont match any other conditions 
 const isOnePair = (cards) => {
   const valueCounts = {};
   for (let i = 0; i < cards.length; i++) {

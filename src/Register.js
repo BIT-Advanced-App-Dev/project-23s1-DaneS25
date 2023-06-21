@@ -8,7 +8,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./register.css";
 
-
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +16,7 @@ function Register() {
   const navigate = useNavigate();
   const [loadingRegister, setLoadingRegister] = useState(false);
 
+  // Registration feilds 
   const register = async () => {
     if (!name) {
       toast.error("Please enter a name");
@@ -38,6 +38,7 @@ function Register() {
     setLoadingRegister(false);
   };
   
+  // Logs into user after registration and navigates them to the lobby 
   useEffect(() => {
     if (user) {
       navigate("/lobby");

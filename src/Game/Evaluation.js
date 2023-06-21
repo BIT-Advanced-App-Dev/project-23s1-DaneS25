@@ -24,7 +24,9 @@ const Evaluation = () => {
   const [loading, setLoading] = useState(false);
   const [draw, setDraw] = useState(false);
   const [drawPlayers, setDrawPlayers] = useState([]);
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
+  // Fetch game creator user  
   useEffect(() => {
     const fetchGameCreator = async () => {
       const gameRef = doc(db, 'games', gameId);
@@ -39,6 +41,7 @@ const Evaluation = () => {
     fetchGameCreator();
   }, [gameId]);
 
+  // Create a subcollection called clickCount to keep track of clicks
   const createClickCountDocument = async () => {
     const clickCountCollectionRef = collection(db, 'games', gameId, 'clickCount');
     const newClickCountDocRef = doc(clickCountCollectionRef);
@@ -124,6 +127,7 @@ const Evaluation = () => {
     return () => unsubscribe();
   }, [gameId, playerId]);  
 
+  // useEffect to check the evaluatedHands collections for the winning hand
   useEffect(() => {
     if (evaluationTriggered && playerCount === evaluatedHandsCount) {
       const evaluateHands = async () => {
@@ -138,7 +142,7 @@ const Evaluation = () => {
         let highestHand = null;
         let isDraw = false;
         let drawPlayers = [];
-        
+        // Check for winning hand or if its a draw
         evaluatedHandsSnapshot.forEach((doc) => {
           const evaluatedHandData = doc.data();
           const evaluatedCards = evaluatedHandData.evaluatedCards;
@@ -147,7 +151,7 @@ const Evaluation = () => {
             toast.error('Evaluated cards data is missing for', doc.id);
             return;
           }
-        
+          
           evaluatedCards.forEach((hand) => {
             if (!highestHand || hand.handStrength > highestHand.handStrength) {
               highestHand = hand;
@@ -178,6 +182,19 @@ const Evaluation = () => {
     }
   }, [evaluationTriggered, gameId, playerCount, evaluatedHandsCount, clickCount]);  
 
+  // Allow a bit of extra time for the clickCount to update and check the length against player count
+  useEffect(() => {
+    if (playerCount === clickCount) {
+      // Enable the button after a delay of 500 milliseconds
+      const timeout = setTimeout(() => {
+        setIsButtonEnabled(true);
+      }, 500);
+  
+      return () => clearTimeout(timeout);
+    }
+  }, [playerCount, clickCount]);
+
+  // Handle the exit button click, delete the games doc to terminate the GameInstance URl 
   const handleExit = async () => {
     try {
       setLoading(true);
@@ -221,10 +238,7 @@ const Evaluation = () => {
       </div>
       ) : (
         <>
-          {isGameCreator && playerCount === clickCount && (
-            <button className='exitButton' onClick={handleExit}>Exit</button>
-          )}
-          {!isGameCreator && playerCount === clickCount && (
+          {(isGameCreator || !isGameCreator) && isButtonEnabled && (
             <button className='exitButton' onClick={handleExit}>Exit</button>
           )}
         </>

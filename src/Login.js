@@ -27,6 +27,7 @@ function Login() {
     }
   }, [user, loading, navigate]);
 
+  // Login to existing authenticated user
   const handleLogin = async () => {
     try {
       await logInWithEmailAndPassword(email, password);
@@ -44,7 +45,7 @@ function Login() {
             authProvider: "local"
           });
         }
-    
+        // Navigate to lobby upon login
         navigate("/Lobby");
       }
 

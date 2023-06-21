@@ -17,11 +17,13 @@ function Lobby() {
     if (!user) return navigate("/");
   }, [user, loading, navigate]);
 
+  // Navigate back to the login screen when logout clicked
   const logout = async () => {
     await auth.signOut();
     navigate("/");
   };
 
+  // Get user data to display name of user that is logged in
   useEffect(() => {
     if (user) {
       const getUserData = async () => {
@@ -37,7 +39,6 @@ function Lobby() {
         } else {
           console.log('User document does not exist');
         }
-
         setLoadingUserName(false);
       };
 
@@ -45,6 +46,7 @@ function Lobby() {
     }
   }, [user]);
   
+  // Unsibscribe on logout
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
