@@ -70,4 +70,8 @@ The winner will be determined by which player has the highest hand strength valu
 If the top hand strength values match its considered a draw.  
 After the winner has been determined players can exit the game and will be navigated back to the lobby.  
 
+# Example Gameplay
+
+https://github.com/BIT-Advanced-App-Dev/project-23s1-DaneS25/assets/71624904/cc3e9808-40dd-490a-ab5b-a3ab7ba5d652
+
 
