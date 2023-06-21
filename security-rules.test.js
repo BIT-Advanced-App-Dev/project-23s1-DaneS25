@@ -1,4 +1,4 @@
-const { initializeTestEnvironment, assertFails, assertSucceeds } = require('@firebase/rules-unit-testing');
+const { initializeTestEnvironment, assertSucceeds } = require('@firebase/rules-unit-testing');
 const { firestore } = require('firebase-admin');
 const firebase = require('firebase/app');
 
