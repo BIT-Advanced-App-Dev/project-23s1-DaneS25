@@ -61,6 +61,7 @@ function Register() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Full Name"
+          data-testid="name-input"
         />
         <input
           type="text"
@@ -68,6 +69,7 @@ function Register() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="E-mail Address"
+          data-testid="email-input"
         />
         <input
           type="password"
@@ -75,8 +77,9 @@ function Register() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          data-testid="password-input"
         />
-        <button className="register__btn" onClick={register}>
+        <button className="register__btn" data-testid="register-button" onClick={register}>
           Register
         </button>
       </div>
