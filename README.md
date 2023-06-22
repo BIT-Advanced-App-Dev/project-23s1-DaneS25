@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# Danes Poker App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Live Deployment: [dane-poker](https://dane-poker.web.app/)
 
 ## Available Scripts
 
@@ -14,12 +14,17 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
+### `npm test a`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs all the tests for hand calculations.
 
-### `npm run build`
+### `emulators:exec`
+
+Runs the emulators tests for security rules:  
+`firebase emulators:exec "npx jest security-rules-failure.test.js"`  
+`firebase emulators:exec "npx jest security-rules.test.js"`  
+
+### `npm run build`  
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
@@ -27,44 +32,46 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### `firebase deploy`  
 
-### `npm run eject`
+Updates the live firebase deployment with the latest build.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Insructions for players
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Register an account or use a test account
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Test accounts have been made already, feel free to use any of these accounts:    
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+email: jane@email.com  
+password: janepass  
 
-## Learn More
+email: sally@email.com  
+password: sallypass  
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+email: bob@email.com  
+password: bobpass  
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Creating a Game
 
-### Code Splitting
+Once you click the create game button on a logged in user that user is now the game creator for that game.  
+The game creator will only be able to start the game when more than 2 players have joined the game.  
+The game creator can join their own game as a player.  
+All games created by users will be visible for all other logged in users, they will all also be able to join the game.  
+No more than 5 players can join a single game.  
+Once the game creator starts a game the status is updated to "started" while the game is in progress and no other players can join.  
+Once the game is over the game will be deleted from the lobby.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Playing a Game
 
-### Analyzing the Bundle Size
+Once a game has started the game creator can click the deal button, thus dealing a 5 card hand to each player in the game.  
+Each player will have 1 turn each to either replace some cards in their hand or pass the turn to the next player.  
+Once all the players have taken a turn the hand is evaluated and assigned a hand strength.  
+The winner will be determined by which player has the highest hand strength value.  
+If the top hand strength values match its considered a draw.  
+After the winner has been determined players can exit the game and will be navigated back to the lobby.  
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# Example Gameplay
 
-### Making a Progressive Web App
+https://github.com/BIT-Advanced-App-Dev/project-23s1-DaneS25/assets/71624904/cc3e9808-40dd-490a-ab5b-a3ab7ba5d652
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
