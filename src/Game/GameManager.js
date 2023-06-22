@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
-import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { RingLoader } from 'react-spinners';
 import { useNavigate } from 'react-router-dom';
 import "./gameManager.css";
@@ -98,7 +98,16 @@ const GameManager = ({ userName }) => {
   
     const gameRef = doc(db, 'games', gameId);
     const playersRef = collection(gameRef, 'players');
-    // Create players subcollection in games doc
+  
+    const playerQuerySnapshot = await getDocs(
+      query(playersRef, where('userId', '==', user.uid))
+    );
+  
+    if (!playerQuerySnapshot.empty) {
+      setErrorMessage('You have already joined this game.');
+      return;
+    }
+  
     await addDoc(playersRef, { userId: user.uid, userName: userName });
   
     const gameSnapshot = await getDoc(gameRef);
@@ -128,7 +137,7 @@ const GameManager = ({ userName }) => {
     });
   
     console.log(`User ${user.uid} joined game ${gameId}`);
-  };     
+  };    
 
   const startGame = async (gameId) => {
     const gameRef = doc(db, 'games', gameId);
@@ -154,9 +163,10 @@ const GameManager = ({ userName }) => {
   }
 
   return (
-    <div>
+    <div className='managerContainer'>
       <ToastContainer position="top-center" theme="dark" />
       <button className='createButton' onClick={createGame}>Create Game</button>
+      <p>--------------------------------------------------------------------------------------------</p>
       {games.map((game) => (
         <div key={game.id}>
           <p>Game ID: {game.id}</p>
@@ -167,7 +177,13 @@ const GameManager = ({ userName }) => {
               {game.players.length >= 5 ? (
                 <button className='joinButton' disabled>Game Full</button>
               ) : (
-                <button className='joinButton' onClick={() => joinGame(game.id)}>Join Game</button>
+                <button
+                  className='joinButton'
+                  onClick={() => joinGame(game.id)}
+                  disabled={game.players.some((player) => player.userId === auth.currentUser?.uid)}
+                >
+                  Join Game
+              </button>
               )}
               <p className='players'>Players: {game.players.map((player) => player.userName).join(', ')}</p>
             </>
@@ -182,6 +198,7 @@ const GameManager = ({ userName }) => {
               )}
             </>
           )}
+          <p>--------------------------------------------------------------------------------------------</p>
         </div>
       ))}
     </div>
