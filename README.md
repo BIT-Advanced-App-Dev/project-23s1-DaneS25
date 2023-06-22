@@ -74,4 +74,8 @@ After the winner has been determined players can exit the game and will be navig
 
 https://github.com/BIT-Advanced-App-Dev/project-23s1-DaneS25/assets/71624904/cc3e9808-40dd-490a-ab5b-a3ab7ba5d652
 
+# Example of a Draw between 2 players  
+
+https://github.com/BIT-Advanced-App-Dev/project-23s1-DaneS25/assets/71624904/0ea61dae-8077-4baa-951a-016b82619391
+
 
