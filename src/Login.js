@@ -71,6 +71,7 @@ function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="E-mail Address"
+          data-testid="email-input"
         />
         <input
           type="password"
@@ -78,8 +79,9 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          data-testid="password-input"
         />
-        <button className="login__btn" onClick={handleLogin}>
+        <button className="login__btn" data-testid="login-button" onClick={handleLogin}>
           Login
         </button>
         <div>
