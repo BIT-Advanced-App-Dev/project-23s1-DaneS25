@@ -13,6 +13,15 @@ jest.mock('firebase/app', () => {
           set: jest.fn(() => Promise.resolve()),
           update: jest.fn(),
           delete: jest.fn(),
+          collection: jest.fn(() => ({
+            doc: jest.fn(() => ({
+              get: jest.fn(() => Promise.resolve({})),
+              set: jest.fn(() => Promise.resolve()),
+              update: jest.fn(),
+              delete: jest.fn(),
+            })),
+            get: jest.fn(() => Promise.resolve({})),
+          })),
         })),
         get: jest.fn(() => Promise.resolve({})),
       })),
@@ -69,4 +78,92 @@ describe('Firestore security rules', () => {
     // Attempt to delete the game document
     await assertSucceeds(gameDocRef.delete());
   });
+
+  it('should allow read access to the hands subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const handsCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('hands');
+  
+    // Attempt to read the hands subcollection
+    await assertSucceeds(handsCollectionRef.get());
+  });
+  
+  it('should allow write access to the hands subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const handsCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('hands');
+  
+    // Attempt to write to the hands subcollection
+    await assertSucceeds(handsCollectionRef.doc('test-hand-id').set({ data: 'test' }));
+  });
+
+  it('should allow read access to the discardedCards subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const discardedCardsCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('discardedCards');
+  
+    // Attempt to read the discardedCards subcollection
+    await assertSucceeds(discardedCardsCollectionRef.get());
+  });
+  
+  it('should allow write access to the discardedCards subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const discardedCardsCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('discardedCards');
+  
+    // Attempt to write to the discardedCards subcollection
+    await assertSucceeds(discardedCardsCollectionRef.doc('test-card-id').set({ data: 'test' }));
+  });
+  
+  it('should allow read access to the evaluatedHands subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const evaluatedHandsCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('evaluatedHands');
+  
+    // Attempt to read the evaluatedHands subcollection
+    await assertSucceeds(evaluatedHandsCollectionRef.get());
+  });
+  
+  it('should allow write access to the evaluatedHands subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const evaluatedHandsCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('evaluatedHands');
+  
+    // Attempt to write to the evaluatedHands subcollection
+    await assertSucceeds(evaluatedHandsCollectionRef.doc('test-evaluated-hand-id').set({ data: 'test' }));
+  });
+  
+  it('should allow read access to the clickCount subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const clickCountCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('clickCount');
+  
+    // Attempt to read the clickCount subcollection
+    await assertSucceeds(clickCountCollectionRef.get());
+  });
+  
+  it('should allow write access to the clickCount subcollection if authorized', async () => {
+    const db = firebase.firestore();
+    const clickCountCollectionRef = db
+      .collection('games')
+      .doc('test-game-id')
+      .collection('clickCount');
+  
+    // Attempt to write to the clickCount subcollection
+    await assertSucceeds(clickCountCollectionRef.doc('test-click-id').set({ data: 'test' }));
+  });  
 });
