@@ -271,26 +271,21 @@ const GameInstance = () => {
                 <ul>
                   {dealt.cards.map((card) => (
                     <span
-                      className="cards"
-                      key={card.id}
-                      style={{
-                        backgroundColor: selectedCards.includes(card.id)
-                          ? 'hsl(219, 92%, 53%)'
-                          : '#5ad9f3',
-                      }}
-                      onClick={() => handleCardClick(card.id)}
+                        className={`cards ${selectedCards.includes(card.id) ? 'card-selected' : ''}`} // Add the class based on selection
+                        key={card.id}
+                        onClick={() => handleCardClick(card.id)}
                     >
-                      {isLoading ? (
-                      <div className="spinner-container">
-                        <RingLoader color="#123abc" size={50} />
-                      </div>
-                      ) : (
-                        <img
-                          src={require(`./Assets/cards/${card.name.toLowerCase()}_of_${card.suit.toLowerCase()}.png`)}
-                          alt={`${card.name} of ${card.suit}`}
-                          className="card-image"
-                        />
-                      )}
+                        {isLoading ? (
+                            <div className="spinner-container">
+                                <RingLoader color="#123abc" size={50} />
+                            </div>
+                        ) : (
+                            <img
+                                src={require(`./Assets/cards/${card.name.toLowerCase()}_of_${card.suit.toLowerCase()}.png`)}
+                                alt={`${card.name} of ${card.suit}`}
+                                className="card-image"
+                            />
+                        )}
                     </span>
                   ))}
                 </ul>

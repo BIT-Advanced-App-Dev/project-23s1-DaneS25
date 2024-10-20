@@ -1,9 +1,9 @@
 .App {
   text-align: center;
   /* background-image: url('./Assets/pokertable1.jpg'); */
-  background-size: cover; /* Ensures the image covers the entire viewport */
-  background-repeat: no-repeat; /* Prevents the image from repeating */
-  background-position: center; /* Centers the image in the viewport */
+  /* /* Ensures the image covers the entire viewport */
+  /*background-repeat: no-repeat; /* Prevents the image from repeating */
+  /*background-position: center; /* Centers the image in the viewport */
 }
 
 .spinner-container {
@@ -17,4 +17,8 @@ Body {
   background-size: cover; /* Ensures the image covers the entire viewport */
   background-repeat: no-repeat; /* Prevents the image from repeating */
   background-position: center; /* Centers the image in the viewport */
+}
+html, body {
+  height: 100%; /* Set the height to 100% */
+  margin: 0; /* Remove default margin */
 }
