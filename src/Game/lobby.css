@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amatic+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Prociono&display=swap');
 
 .logout_btn {
     font-size: 18px;
@@ -7,10 +7,12 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
-    background-color: rgb(96, 204, 250);
+    background-color: rgb(225, 111, 4);
+    font-family: "Prociono", serif;
+    color: whitesmoke;
 }
 .logout_btn:hover {
-    background-color: hsl(219, 92%, 53%);
+    background-color: hsl(0, 93%, 61%);
     cursor: pointer;
 }
 .userDetails {
@@ -18,11 +20,22 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
+    font-family: "Prociono", serif;
+    color: whitesmoke;
 }
 .head {
     font-size: 60px;
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
-    font-family: 'Amatic SC', cursive;
+    font-family: "Prociono", serif;
+    color: whitesmoke;
+}
+.lobby {
+    background-color: rgba(0, 0, 0, 0.5); /* Transparent black */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    max-width: 500px;
+    margin: 0 auto; /* Center the container */
+    margin-top: 30px;
 }

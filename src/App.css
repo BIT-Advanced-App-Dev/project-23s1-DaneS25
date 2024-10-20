@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-image: url('./Assets/pokertable1.jpg');
+  /* background-image: url('./Assets/pokertable1.jpg'); */
   background-size: cover; /* Ensures the image covers the entire viewport */
   background-repeat: no-repeat; /* Prevents the image from repeating */
   background-position: center; /* Centers the image in the viewport */
