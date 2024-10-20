@@ -1,19 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Prociono&display=swap');
+
 .dealButton {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 18px;
     border-radius: 5px;
     border: none;
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
-    background-color: rgb(96, 204, 250);
+    background-color: rgb(72, 180, 137);
 }
 .dealButton:hover {
-    background-color: hsl(219, 92%, 53%);
+    background-color: hsl(134, 71%, 40%);
     cursor: pointer;
 }
 .playerName {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 20px;
     margin-bottom: 5px;
+}
+.gameId {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
 }
 .cards-container {
     display: flex;
@@ -41,7 +51,19 @@
     cursor: pointer;
 }
 .turn {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 20px;
+}
+.instanceContainer {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
+    background-color: rgba(0, 0, 0, 0.5); /* Transparent black */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    max-width: 500px;
+    margin: 0 auto; /* Center the container */
+    margin-top: 30px;
 }
 .replaceButton {
     font-size: 18px;
@@ -51,10 +73,10 @@
     padding: 10px;
     margin-top: 10px;
     margin-right: 10px;
-    background-color: rgb(96, 204, 250);
+    background-color: rgb(72, 180, 137);
 }
 .replaceButton:hover {
-    background-color: hsl(219, 92%, 53%);
+    background-color: hsl(134, 71%, 40%);
     cursor: pointer;
 }
 .passButton {
@@ -64,10 +86,10 @@
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
-    background-color: rgb(96, 204, 250);
+    background-color: rgb(72, 180, 137);
 }
 .passButton:hover {
-    background-color: hsl(219, 92%, 53%);
+    background-color: hsl(134, 71%, 40%);
     cursor: pointer;
 }
   

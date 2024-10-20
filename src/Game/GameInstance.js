@@ -240,10 +240,10 @@ const GameInstance = () => {
   }, [gameEnded, gameId, playerId, navigate]);
 
   return (
-    <div>
+    <div className='instanceContainer'>
       <ToastContainer position="top-center" theme="dark" />
       <h1 className='head'>Game Instance</h1>
-      <p>Game ID: {gameId}</p>
+      <p className='gameId'>Game ID: {gameId}</p>
       <p className='playerName'>Current Player: {currentPlayer.name}</p>
       {isGameCreator && (
         <div>
