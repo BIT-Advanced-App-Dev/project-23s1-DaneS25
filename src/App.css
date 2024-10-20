@@ -1,6 +1,9 @@
 .App {
   text-align: center;
-  background-color: rgb(180, 231, 253);
+  background-image: url('./Assets/pokertable1.jpg');
+  background-size: cover; /* Ensures the image covers the entire viewport */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-position: center; /* Centers the image in the viewport */
 }
 
 .spinner-container {
@@ -10,5 +13,8 @@
   height: 100vh;
 }
 Body {
-  background-color: rgb(180, 231, 253);
+  background-image: url('./Assets/pokertable1.jpg');
+  background-size: cover; /* Ensures the image covers the entire viewport */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-position: center; /* Centers the image in the viewport */
 }
