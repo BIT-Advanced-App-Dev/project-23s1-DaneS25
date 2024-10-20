@@ -223,7 +223,7 @@ const Evaluation = () => {
   }; 
 
   return (
-    <div>
+    <div className='evaluationContainer'>
       <ToastContainer position="top-center" theme="dark" />
       <h1 className='head'>Evaluation</h1>
       {!evaluationTriggered && playerCount === evaluatedHandsCount && (
@@ -247,10 +247,13 @@ const Evaluation = () => {
         <div key={index}>
           <p className='evaluationText'>
             {hand.cards.map((card, cardIndex) => (
-              <p className="cards" key={cardIndex}>
-                {card.name} of {card.suit}
-                {cardIndex !== hand.cards.length - 1}
-              </p>
+              <div className="cards" key={cardIndex}>
+                <img 
+                  src={require(`./Assets/cards/${card.name.toLowerCase()}_of_${card.suit.toLowerCase()}.png`)} 
+                  alt={`${card.name} of ${card.suit}`} 
+                  className="card-image"
+                />
+              </div>
             ))}
           </p>
           <p className='handText'>Hand Type: {hand.handType}</p>
@@ -260,10 +263,13 @@ const Evaluation = () => {
               <h2>Winning Hand: {winningHand.playerName}</h2>
               <p className='evaluationText'>
                 {winningHand.cards.map((card, cardIndex) => (
-                  <p className="cards" key={cardIndex}>
-                    {card.name} of {card.suit}
-                    {cardIndex !== winningHand.cards.length - 1}
-                  </p>
+                  <div className="cards" key={cardIndex}>
+                    <img 
+                      src={require(`./Assets/cards/${card.name.toLowerCase()}_of_${card.suit.toLowerCase()}.png`)}
+                      alt={`${card.name} of ${card.suit}`} 
+                      className="card-image"
+                    />
+                  </div>
                 ))}
               </p>
               <p className='handText'>Hand Type: {winningHand.handType}</p>

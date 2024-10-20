@@ -285,7 +285,11 @@ const GameInstance = () => {
                         <RingLoader color="#123abc" size={50} />
                       </div>
                       ) : (
-                        `${card.name} of ${card.suit}` // Display the players cards
+                        <img
+                          src={require(`./Assets/cards/${card.name.toLowerCase()}_of_${card.suit.toLowerCase()}.png`)}
+                          alt={`${card.name} of ${card.suit}`}
+                          className="card-image"
+                        />
                       )}
                     </span>
                   ))}

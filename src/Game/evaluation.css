@@ -1,21 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Prociono&display=swap');
+
 .evaluationText {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 20px;
 }
 .handText {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 25px;
 }
 .cards {
-    width: 200px;
-    height: 250px;
     text-align: center;
     display: inline-block;
     align-items: center;
     justify-content: center;
     border: none;
-    padding: 10px;
-    margin-right: 10px;
-    border-radius: 5px;
-    box-shadow: 0 6px 18px -9px hsl(229, 93%, 58%);
     transition: transform 0.3s ease;
 }
 .cards:hover {
@@ -23,32 +23,46 @@
     cursor: pointer;
 }
 .evaluateButton {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 18px;
     border-radius: 5px;
     border: none;
     margin-bottom: 5px;
     padding: 10px;
     margin-top: 10px;
-    background-color: rgb(96, 204, 250);
+    background-color: rgb(72, 180, 137);
 }
 .evaluateButton:hover {
-    background-color: hsl(219, 92%, 53%);
+    background-color: hsl(134, 71%, 40%);
     cursor: pointer;
 }
 .exitButton {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
     font-size: 18px;
     border-radius: 5px;
     border: none;
     margin-bottom: -10px;
     padding: 10px;
     margin-top: -20px;
-    background-color: rgb(96, 204, 250);
+    background-color: rgb(72, 180, 137);
 }
 .exitButton:hover {
-    background-color: hsl(219, 92%, 53%);
+    background-color: hsl(134, 71%, 40%);
     cursor: pointer;
 }
 .drawMessage {
     margin-top: 20px;
     font-size: 20px;
+}
+.evaluationContainer {
+    font-family: "Prociono", serif;
+    color: whitesmoke;
+    background-color: rgba(0, 0, 0, 0.5); /* Transparent black */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    max-width: 500px;
+    margin: 0 auto; /* Center the container */
+    margin-top: 30px;
 }

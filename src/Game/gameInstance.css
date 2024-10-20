@@ -31,20 +31,27 @@
     gap: 10px;
     text-align: left;
 }
+
 .cards {
-    width: 200px;
-    height: 250px;
+    width: 80px; /* Reduced width to make the cards smaller */
+    height: 115px; /* Reduced height to maintain the aspect ratio */
     text-align: center;
-    display: inline-block;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    padding: 10px;
+    background-color: transparent; /* Remove the background color */
+    border: none; /* Remove any border */
+    padding: 0; /* Remove extra padding */
     margin-right: 10px;
     border-radius: 5px;
-    box-shadow: 0 6px 18px -9px hsl(229, 93%, 58%);
     transition: transform 0.3s ease;
-    background-color: #5ad9f3;
+}
+.card-image {
+    width: 100%; /* Ensure the image fully fits the .cards container */
+    height: 100%; /* Ensure the image fully fits the height */
+    display: block;
+    object-fit: cover; /* Ensure the image fits the container without stretching */
+    border-radius: 5px; /* Match the border-radius of the container */
 }
 .cards:hover {
     transform: scale(1.05);
